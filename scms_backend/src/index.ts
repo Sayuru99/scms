@@ -39,7 +39,10 @@ app.use("/api/auth/login", loginRateLimiter);
 const speedLimiter = slowDown({
   windowMs: 5 * 60 * 1000,
   delayAfter: 5,
-  delayMs: 500,
+  delayMs: (used, req) => {
+    const delayAfter = req.slowDown.limit;
+    return (used - delayAfter) * 500;
+  },
 });
 
 app.use("/api/auth/login", speedLimiter);
@@ -49,7 +52,7 @@ app.use("/api/auth", authRoutes);
 const startServer = async () => {
   await AppDataSource.initialize();
   app.listen(process.env.PORT || 5000, () => {
-    console.log("Server is running...");
+    console.log("Hello group 8 dev team " + "port: " + process.env.PORT);
   });
 };
 
