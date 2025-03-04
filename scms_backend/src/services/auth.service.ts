@@ -68,7 +68,7 @@ export class AuthService {
     });
     if (existingUser) throw new Error("University ID already registered");
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
     const user = this.userRepo.create({
       email,
       password: hashedPassword,
