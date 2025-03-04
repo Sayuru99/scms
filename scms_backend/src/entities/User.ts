@@ -27,6 +27,13 @@ export enum Gender {
   PREFER_NOT_TO_SAY = "prefer_not_to_say",
 }
 
+export enum UserRole {
+  STUDENT = "student",
+  LECTURER = "lecturer",
+  STAFF = "staff",
+  ADMIN = "admin",
+}
+
 @Entity("users")
 export class User {
   @ApiProperty()
@@ -61,11 +68,12 @@ export class User {
   universityId!: string;
 
   @ApiProperty()
-  @Column({
-    type: "enum",
-    enum: Gender,
-    nullable: true,
-  })
+  @Column({ type: "enum", enum: UserRole, default: UserRole.STUDENT })
+  @IsEnum(UserRole)
+  role!: UserRole;
+
+  @ApiProperty()
+  @Column({ type: "enum", enum: Gender, nullable: true })
   @IsOptional()
   gender?: Gender;
 
@@ -75,11 +83,7 @@ export class User {
   dateOfBirth?: Date;
 
   @ApiProperty()
-  @Column({
-    type: "enum",
-    enum: UserStatus,
-    default: UserStatus.ACTIVE,
-  })
+  @Column({ type: "enum", enum: UserStatus, default: UserStatus.ACTIVE })
   @IsEnum(UserStatus)
   status: UserStatus = UserStatus.ACTIVE;
 
@@ -95,6 +99,14 @@ export class User {
   @ApiProperty()
   @Column({ nullable: true })
   lastLogin?: Date;
+
+  @ApiProperty()
+  @Column({ nullable: true, length: 45 })
+  lastLoginIp?: string;
+
+  @ApiProperty()
+  @Column({ nullable: true, length: 255, select: false })
+  refreshToken?: string;
 
   @ApiProperty()
   @CreateDateColumn()
