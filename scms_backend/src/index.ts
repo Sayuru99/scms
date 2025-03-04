@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import "dotenv/config";
 import cors from "cors";
 import helmet from "helmet";
@@ -13,7 +13,7 @@ dotenv.config();
 
 const app = express();
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   if (req.body) {
     Object.keys(req.body).forEach((key) => {
       if (typeof req.body[key] === "string") {
@@ -31,10 +31,8 @@ app.use(cors());
 const loginRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
-  message: "Too many requests from this IP, please try again later.",
+  message: "Too many requests, please try again later.",
 });
-
-app.use("/api/auth/login", loginRateLimiter);
 
 const speedLimiter = slowDown({
   windowMs: 5 * 60 * 1000,
@@ -45,15 +43,25 @@ const speedLimiter = slowDown({
   },
 });
 
-app.use("/api/auth/login", speedLimiter);
-
+app.use("/api/auth/login", speedLimiter, loginRateLimiter);
 app.use("/api/auth", authRoutes);
 
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Internal server error" });
+});
+
 const startServer = async () => {
-  await AppDataSource.initialize();
-  app.listen(process.env.PORT || 5000, () => {
-    console.log("Hello group 8 dev team " + "port: " + process.env.PORT);
-  });
+  try {
+    await AppDataSource.initialize();
+    const port = parseInt(process.env.PORT || "5000", 10);
+    app.listen(port, () => {
+      console.log("Hello group 8 dev team " + "port: " + process.env.PORT);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 };
 
 startServer();

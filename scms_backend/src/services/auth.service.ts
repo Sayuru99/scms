@@ -189,7 +189,6 @@ export class AuthService {
     await this.userRepo.save(user);
 
     await this.authCodeRepo.delete(authCode.id);
-
     return { accessToken, refreshToken };
   }
 
@@ -217,7 +216,30 @@ export class AuthService {
 
     user.refreshToken = newRefreshToken;
     await this.userRepo.save(user);
-
     return { accessToken, refreshToken: newRefreshToken };
+  }
+
+  async logout(userId: string): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new Error("User not found");
+
+    user.refreshToken = undefined;
+    user.lastLoginIp = undefined;
+    await this.userRepo.save(user);
+  }
+
+  async validateScopes(
+    userId: string,
+    requiredScopes: string[]
+  ): Promise<boolean> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) return false;
+
+    const role = await this.roleRepo.findOne({
+      where: { name: user.role },
+      relations: ["permissions"],
+    });
+    const userScopes = role?.permissions.map((p) => p.name) || [];
+    return requiredScopes.every((scope) => userScopes.includes(scope));
   }
 }

@@ -1,9 +1,11 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
+  ManyToOne,
   CreateDateColumn,
 } from "typeorm";
+import { Role } from "./Role";
+import { Permission } from "./Permission";
 import { ApiProperty } from "@nestjs/swagger";
 
 @Entity("role_permissions")
@@ -13,12 +15,14 @@ export class RolePermission {
   id!: string;
 
   @ApiProperty()
-  @Column("uuid")
-  roleId!: string;
+  @ManyToOne(() => Role, (role) => role.permissions, { nullable: false })
+  role!: Role;
 
   @ApiProperty()
-  @Column("uuid")
-  permissionId!: string;
+  @ManyToOne(() => Permission, (permission) => permission.roles, {
+    nullable: false,
+  })
+  permission!: Permission;
 
   @ApiProperty()
   @CreateDateColumn()

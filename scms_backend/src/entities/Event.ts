@@ -3,14 +3,12 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  ManyToMany,
-  JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { IsNotEmpty, IsDate, Length } from "class-validator";
-import { EventCategory } from "./EventCategory";
 import { User } from "./User";
+import { EventCategory } from "./EventCategory";
+import { IsNotEmpty, Length } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 @Entity("events")
@@ -22,39 +20,34 @@ export class Event {
   @ApiProperty()
   @Column({ length: 100 })
   @IsNotEmpty()
-  @Length(3, 100)
+  @Length(1, 100)
   title!: string;
 
   @ApiProperty()
-  @Column({ type: "text" })
+  @Column({ type: "text", nullable: true })
+  description?: string;
+
+  @ApiProperty()
+  @Column({ type: "timestamp", nullable: true })
   @IsNotEmpty()
-  description!: string;
+  startTime?: Date;
 
   @ApiProperty()
-  @Column()
-  @IsDate()
-  startTime!: Date;
+  @Column({ type: "timestamp", nullable: true })
+  @IsNotEmpty()
+  endTime?: Date;
 
   @ApiProperty()
-  @Column()
-  @IsDate()
-  endTime!: Date;
+  @Column({ length: 100, nullable: true })
+  location?: string;
 
-  @ManyToOne(() => EventCategory, (category) => category.events, {
-    eager: true,
-  })
-  category!: EventCategory;
-
-  @ManyToOne(() => User, { eager: true })
+  @ApiProperty()
+  @ManyToOne(() => User, { nullable: false })
   createdBy!: User;
 
-  @ManyToMany(() => User)
-  @JoinTable({
-    name: "event_managers",
-    joinColumn: { name: "event_id", referencedColumnName: "id" },
-    inverseJoinColumn: { name: "user_id", referencedColumnName: "id" },
-  })
-  managers!: User[];
+  @ApiProperty()
+  @ManyToOne(() => EventCategory, (category) => category.events)
+  category!: EventCategory;
 
   @ApiProperty()
   @Column({ default: true })
