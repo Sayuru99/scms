@@ -32,6 +32,42 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+export const authorize = async (req: Request, res: Response) => {
+  try {
+    const { client_id, redirect_uri, scope, state, email, password } = req.body;
+    const ip = req.ip || "";
+    const { code, state: returnedState } = await authService.authorize(
+      client_id,
+      redirect_uri,
+      scope,
+      state,
+      email,
+      password,
+      ip
+    );
+    res.status(200).json({ code, state: returnedState });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const token = async (req: Request, res: Response) => {
+  try {
+    const { code, client_id, client_secret, redirect_uri } = req.body;
+    const ip = req.ip || "";
+    const tokens = await authService.exchangeCode(
+      code,
+      client_id,
+      client_secret,
+      redirect_uri,
+      ip
+    );
+    res.status(200).json(tokens);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 export const refresh = async (req: Request, res: Response) => {
   try {
     const { refreshToken } = req.body;
