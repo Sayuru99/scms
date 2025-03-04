@@ -194,18 +194,18 @@ export class AuthService {
   }
 
   async refreshToken(
-    refreshToken: string,
+    oldRefreshToken: string,
     ip: string
-  ): Promise<{ accessToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userRepo.findOne({
-      where: { refreshToken },
+      where: { refreshToken: oldRefreshToken },
       select: ["id", "role", "lastLoginIp", "refreshToken"],
     });
     if (!user) throw new Error("Invalid refresh token");
     if (user.lastLoginIp !== ip)
       throw new Error("IP address mismatch with last login IP");
 
-    const decoded = verifyRefreshToken(refreshToken, ip);
+    const decoded = verifyRefreshToken(oldRefreshToken, ip);
     const role = await this.roleRepo.findOne({
       where: { name: user.role },
       relations: ["permissions"],
@@ -213,6 +213,11 @@ export class AuthService {
     const scopes = role?.permissions.map((p) => p.name) || [];
 
     const accessToken = generateAccessToken(user, scopes);
-    return { accessToken };
+    const newRefreshToken = generateRefreshToken(user, ip, scopes);
+
+    user.refreshToken = newRefreshToken;
+    await this.userRepo.save(user);
+
+    return { accessToken, refreshToken: newRefreshToken };
   }
 }
