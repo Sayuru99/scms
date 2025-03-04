@@ -15,11 +15,11 @@ export class Student {
   @Column({ unique: true, length: 20 })
   @IsNotEmpty()
   @Length(6, 20)
-  studentId!: string; // Normal ID without prefix
+  studentId!: string;
 
   @Column({ unique: true, length: 22 })
   @IsNotEmpty()
-  prefixedStudentId!: string; // ID with "00" prefix
+  prefixedStudentId!: string;
 
   @Column({ length: 100 })
   @IsNotEmpty()
