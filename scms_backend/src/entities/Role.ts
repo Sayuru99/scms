@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
 import { Permission } from "./Permission";
 
 @Entity("roles")
@@ -11,6 +19,9 @@ export class Role {
 
   @Column({ type: "text", nullable: true })
   description?: string;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
 
   @ManyToMany(() => Permission)
   @JoinTable({ name: "roles_permissions" })
