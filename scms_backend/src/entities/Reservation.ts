@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
 import { Resource } from "./Resource";
@@ -28,6 +29,15 @@ export class Reservation {
   @Column({ length: 20 })
   status!: string;
 
+  @Column({ type: "text", nullable: true })
+  notes?: string;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
+
+  @UpdateDateColumn({ name: "updated_at" })
+  updatedAt!: Date;
 }
