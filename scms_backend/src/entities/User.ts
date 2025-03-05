@@ -4,116 +4,49 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsEnum,
-  Length,
-  IsOptional,
-} from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
 import { Role } from "./Role";
-
-export enum UserStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  SUSPENDED = "suspended",
-}
-
-export enum Gender {
-  MALE = "male",
-  FEMALE = "female",
-  OTHER = "other",
-  PREFER_NOT_TO_SAY = "prefer_not_to_say",
-}
-
-export enum UserRole {
-  STUDENT = "student",
-  LECTURER = "lecturer",
-  STAFF = "staff",
-  ADMIN = "admin",
-}
+import { Permission } from "./Permission";
 
 @Entity("users")
 export class User {
-  @ApiProperty()
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @ApiProperty()
-  @Column({ unique: true, length: 100 })
-  @IsEmail()
-  @IsNotEmpty()
+  @Column({ unique: true })
   email!: string;
 
-  @ApiProperty()
-  @Column({ length: 255, select: false })
-  @IsNotEmpty()
+  @Column()
   password!: string;
 
-  @ApiProperty()
-  @Column({ length: 100 })
-  @IsNotEmpty()
+  @Column()
   firstName!: string;
 
-  @ApiProperty()
-  @Column({ length: 100 })
-  @IsNotEmpty()
+  @Column()
   lastName!: string;
 
-  @ApiProperty()
-  @Column({ length: 20, unique: true })
-  @IsNotEmpty()
-  @Length(8, 20)
-  universityId!: string;
+  @Column({ default: true })
+  isActive!: boolean;
 
-  @ApiProperty()
-  @ManyToOne(() => Role, { nullable: false })
-  role!: Role;
-
-  @ApiProperty()
-  @Column({ type: "enum", enum: Gender, nullable: true })
-  @IsOptional()
-  gender?: Gender;
-
-  @ApiProperty()
-  @Column({ type: "date", nullable: true })
-  @IsOptional()
-  dateOfBirth?: Date;
-
-  @ApiProperty()
-  @Column({ type: "enum", enum: UserStatus, default: UserStatus.ACTIVE })
-  @IsEnum(UserStatus)
-  status: UserStatus = UserStatus.ACTIVE;
-
-  @ApiProperty()
-  @Column({ nullable: true, length: 20 })
-  @IsOptional()
-  phoneNumber?: string;
-
-  @ApiProperty()
   @Column({ default: false })
-  isEmailVerified: boolean = false;
+  isFirstLogin!: boolean;
 
-  @ApiProperty()
-  @Column({ nullable: true })
-  lastLogin?: Date;
+  @Column({ type: "simple-array", nullable: true })
+  refreshTokens?: string[];
 
-  @ApiProperty()
-  @Column({ nullable: true, length: 45 })
-  lastLoginIp?: string;
+  @ManyToMany(() => Role)
+  @JoinTable()
+  roles!: Role[];
 
-  @ApiProperty()
-  @Column({ nullable: true, length: 255, select: false })
-  refreshToken?: string;
+  @ManyToMany(() => Permission)
+  @JoinTable()
+  directPermissions!: Permission[];
 
-  @ApiProperty()
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ApiProperty()
   @UpdateDateColumn()
   updatedAt!: Date;
 }

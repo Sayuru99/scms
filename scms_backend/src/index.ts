@@ -1,77 +1,30 @@
-import express, { Request, Response, NextFunction } from "express";
-import "dotenv/config";
+import "reflect-metadata";
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
-import slowDown from "express-slow-down";
-import sanitizeHtml from "sanitize-html";
-import { AppDataSource } from "./config/db.config";
+import { config } from "dotenv";
+import { AppDataSource } from "./config/database";
 import authRoutes from "./routes/auth.routes";
-import roleRoutes from "./routes/role.routes";
-import permissionRoutes from "./routes/permission.routes";
-import eventRoutes from "./routes/event.routes";
-import * as dotenv from "dotenv";
-import resourceRoutes from "./routes/resource.routes";
-import userRoutes from "./routes/user.routes";
+import { errorHandler } from "./middleware/error.middleware";
 
-dotenv.config();
+config();
 
 const app = express();
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  if (req.body) {
-    Object.keys(req.body).forEach((key) => {
-      if (typeof req.body[key] === "string") {
-        req.body[key] = sanitizeHtml(req.body[key]);
-      }
-    });
-  }
-  next();
-});
-
+app.use(cors());
 app.use(helmet());
 app.use(express.json());
-app.use(cors());
 
-const loginRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: "Too many requests, please try again later.",
-});
-
-const speedLimiter = slowDown({
-  windowMs: 5 * 60 * 1000,
-  delayAfter: 5,
-  delayMs: (used, req) => {
-    const delayAfter = req.slowDown.limit;
-    return (used - delayAfter) * 500;
-  },
-});
-
-app.use("/api/auth/login", loginRateLimiter, speedLimiter);
 app.use("/api/auth", authRoutes);
-app.use("/api/roles", roleRoutes);
-app.use("/api/permissions", permissionRoutes);
-app.use("/api/events", eventRoutes);
-app.use("/api/resources", resourceRoutes);
-app.use("/api/users", userRoutes);
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Internal server error" });
-});
+app.use(errorHandler);
 
-const startServer = async () => {
-  try {
-    await AppDataSource.initialize();
-    const port = parseInt(process.env.PORT || "5000", 10);
-    app.listen(port, () => {
-      console.log("Hello group 8 dev team " + "port: " + process.env.PORT);
+const PORT = process.env.PORT || 3000;
+
+AppDataSource.initialize()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
     });
-  } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
-};
-
-startServer();
+  })
+  .catch((error) => console.log(error));

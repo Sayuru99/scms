@@ -1,36 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { IsNotEmpty, Length } from "class-validator";
-import { RolePermission } from "./RolePermission"; // Import RolePermission
-import { ApiProperty } from "@nestjs/swagger";
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity("permissions")
+@Entity()
 export class Permission {
-  @ApiProperty()
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  @PrimaryColumn()
+  id!: string; 
 
-  @ApiProperty()
-  @Column({ unique: true, length: 100 })
-  @IsNotEmpty()
-  name!: string;
+  @Column()
+  name!: string; 
 
-  @ApiProperty({ required: false })
-  @Column({ length: 255, nullable: true })
-  description?: string;
+  @Column()
+  category!: string; 
 
-  @ApiProperty()
-  @Column({ length: 50 })
-  @IsNotEmpty()
-  category!: string;
+  @Column()
+  description!: string; 
 
-  @ApiProperty()
-  @Column({ default: true })
-  isActive: boolean = true;
+  @CreateDateColumn()
+  createdAt!: Date; 
 
-  @ApiProperty()
-  @OneToMany(
-    () => RolePermission,
-    (rolePermission) => rolePermission.permission
-  )
-  rolePermissions!: RolePermission[];
+  @UpdateDateColumn()
+  updatedAt!: Date; 
 }
