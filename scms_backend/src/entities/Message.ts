@@ -22,6 +22,12 @@ export class Message {
   @Column({ type: "text" })
   content!: string;
 
+  @Column({ name: "is_read", default: false })
+  isRead!: boolean;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
+
   @CreateDateColumn({ name: "sent_at" })
   sentAt!: Date;
 }

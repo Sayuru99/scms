@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
 import { Group } from "./Group";
 import { User } from "./User";
 
@@ -10,9 +10,15 @@ export class GroupMember {
   @PrimaryColumn()
   userId!: string;
 
-  @ManyToOne(() => Group, (group) => group.id)
+  @Column({ length: 20, default: "Member" })
+  role!: string;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
+
+  @ManyToOne(() => Group)
   group!: Group;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User)
   user!: User;
 }
