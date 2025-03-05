@@ -30,10 +30,10 @@ export class AuthService {
     lastName: string,
     universityId: string
   ): Promise<User> {
-    let role: UserRole;
+    let roleName: string;
 
     if (universityId.startsWith("00")) {
-      role = UserRole.STUDENT;
+      roleName = "student";
       const studentExists = await this.studentRepo.findOne({
         where: { prefixedStudentId: universityId },
       });
@@ -42,7 +42,7 @@ export class AuthService {
           "University ID not recognized as a student. Please contact admin."
         );
     } else if (universityId.startsWith("01")) {
-      role = UserRole.LECTURER;
+      roleName = "lecturer";
       const lecturerExists = await this.lecturerRepo.findOne({
         where: { prefixedLecturerId: universityId },
       });
@@ -51,7 +51,7 @@ export class AuthService {
           "University ID not recognized as a lecturer. Please contact admin."
         );
     } else if (universityId.startsWith("02")) {
-      role = UserRole.STAFF;
+      roleName = "staff";
       const staffExists = await this.staffRepo.findOne({
         where: { prefixedStaffId: universityId },
       });
@@ -67,6 +67,9 @@ export class AuthService {
       where: { universityId },
     });
     if (existingUser) throw new Error("University ID already registered");
+
+    const role = await this.roleRepo.findOne({ where: { name: roleName } });
+    if (!role) throw new Error(`Role ${roleName} not found`);
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = this.userRepo.create({
@@ -88,17 +91,13 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userRepo.findOne({
       where: { email },
-      select: ["id", "email", "password", "role", "refreshToken"],
+      relations: ["role", "role.permissions"],
+      select: ["id", "email", "password", "refreshToken"],
     });
     if (!user || !(await bcrypt.compare(password, user.password)))
       throw new Error("Invalid credentials");
 
-    const roleEntity = await this.roleRepo.findOne({
-      where: { name: user.role },
-      relations: ["permissions"],
-    });
-    const scopes = roleEntity?.permissions.map((p) => p.name) || [];
-
+    const scopes = user.role.permissions.map((p) => p.name);
     const accessToken = generateAccessToken(user, scopes);
     const refreshToken = generateRefreshToken(user, ip, scopes);
 
@@ -131,7 +130,7 @@ export class AuthService {
       throw new Error("Invalid credentials");
 
     const role = await this.roleRepo.findOne({
-      where: { name: user.role },
+      where: { name: user.role.name },
       relations: ["permissions"],
     });
     const availableScopes = role?.permissions.map((p) => p.name) || [];
@@ -198,18 +197,15 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userRepo.findOne({
       where: { refreshToken: oldRefreshToken },
-      select: ["id", "role", "lastLoginIp", "refreshToken"],
+      relations: ["role", "role.permissions"],
+      select: ["id", "lastLoginIp", "refreshToken"],
     });
     if (!user) throw new Error("Invalid refresh token");
     if (user.lastLoginIp !== ip)
       throw new Error("IP address mismatch with last login IP");
 
     const decoded = verifyRefreshToken(oldRefreshToken, ip);
-    const role = await this.roleRepo.findOne({
-      where: { name: user.role },
-      relations: ["permissions"],
-    });
-    const scopes = role?.permissions.map((p) => p.name) || [];
+    const scopes = user.role.permissions.map((p) => p.name);
 
     const accessToken = generateAccessToken(user, scopes);
     const newRefreshToken = generateRefreshToken(user, ip, scopes);
@@ -236,7 +232,7 @@ export class AuthService {
     if (!user) return false;
 
     const role = await this.roleRepo.findOne({
-      where: { name: user.role },
+      where: { name: user.role.name },
       relations: ["permissions"],
     });
     const userScopes = role?.permissions.map((p) => p.name) || [];

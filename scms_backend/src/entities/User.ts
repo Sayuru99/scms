@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from "typeorm";
 import {
   IsEmail,
@@ -13,6 +14,7 @@ import {
   IsOptional,
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Role } from "./Role";
 
 export enum UserStatus {
   ACTIVE = "active",
@@ -68,9 +70,8 @@ export class User {
   universityId!: string;
 
   @ApiProperty()
-  @Column({ type: "enum", enum: UserRole, default: UserRole.STUDENT })
-  @IsEnum(UserRole)
-  role!: UserRole;
+  @ManyToOne(() => Role, { nullable: false })
+  role!: Role;
 
   @ApiProperty()
   @Column({ type: "enum", enum: Gender, nullable: true })
