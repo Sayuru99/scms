@@ -2,3 +2,4 @@ scms_backend/package-lock.json
 scms_backend/node_modules/
 seed/
 migrations/
+scms_backend/src/seed.ts
