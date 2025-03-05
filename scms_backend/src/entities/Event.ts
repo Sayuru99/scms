@@ -31,11 +31,21 @@ export class Event {
   @Column({ type: "int", nullable: true })
   capacity?: number;
 
-  @ManyToOne(() => EventStatus, { nullable: false })
-  status!: EventStatus;
+  @Column({
+    type: "enum",
+    enum: ["Scheduled", "Ongoing", "Completed", "Cancelled"],
+    default: "Scheduled",
+  })
+  status!: string;
+
+  @Column({ name: "attendees_count", type: "int", default: 0 })
+  attendeesCount!: number;
 
   @ManyToOne(() => User, { nullable: false })
   organizer!: User;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
