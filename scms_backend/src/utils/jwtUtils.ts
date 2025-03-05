@@ -12,7 +12,7 @@ export const generateAccessToken = (
   const secret: JwtSecret = authConfig.jwtAccessSecret as JwtSecret;
   const expiry: string | undefined = authConfig.jwtAccessExpiry;
 
-  if (!secret) throw new Error("JWT Access Secret is not defined");
+  if (!secret) throw new Error("JWT Access Secret is not wrong");
   if (!expiry) throw new Error("JWT Access Expiry is not defined");
 
   const expiresIn: number | string =
