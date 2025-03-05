@@ -13,11 +13,11 @@ import { EventCategory } from "../entities/EventCategory";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || "3306"),
-  username: process.env.DB_USER,
+  host: process.env.DB_HOST || "localhost",
+  port: parseInt(process.env.DB_PORT || "3306", 10),
+  username: process.env.DB_USER || "root",
   password: process.env.DB_PASS || "",
-  database: process.env.DB_NAME,
+  database: process.env.DB_NAME || "scms_group_eight",
   entities: [
     User,
     Student,
@@ -31,6 +31,6 @@ export const AppDataSource = new DataSource({
     Event,
     EventCategory,
   ],
-  synchronize: true,
+  synchronize: true, // Switch to migrations in production
   logging: false,
 });

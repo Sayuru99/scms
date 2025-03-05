@@ -20,7 +20,7 @@ export const generateRefreshToken = (
     typeof expiry === "string" ? ms(expiry as ms.StringValue) / 1000 : expiry;
   const options: jwt.SignOptions = { expiresIn };
 
-  return jwt.sign({ id: user.id, ip, scopes }, secret, options);
+  return jwt.sign({ id: user.id, scopes }, secret, options);
 };
 
 export const verifyRefreshToken = (token: string, ip: string): any => {

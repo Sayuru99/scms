@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { IsNotEmpty, Length } from "class-validator";
-import { Permission } from "./Permission";
+import { RolePermission } from "./RolePermission"; // Import RolePermission
 import { ApiProperty } from "@nestjs/swagger";
 
 @Entity("roles")
@@ -26,8 +26,9 @@ export class Role {
   @Column({ default: true })
   isActive: boolean = true;
 
-  @ManyToMany(() => Permission, (permission) => permission.roles, {
+  @ApiProperty()
+  @OneToMany(() => RolePermission, (rolePermission) => rolePermission.role, {
     cascade: true,
   })
-  permissions!: Permission[];
+  rolePermissions!: RolePermission[];
 }

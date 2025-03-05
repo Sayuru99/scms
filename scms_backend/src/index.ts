@@ -7,7 +7,12 @@ import slowDown from "express-slow-down";
 import sanitizeHtml from "sanitize-html";
 import { AppDataSource } from "./config/db.config";
 import authRoutes from "./routes/auth.routes";
+import roleRoutes from "./routes/role.routes";
+import permissionRoutes from "./routes/permission.routes";
+import eventRoutes from "./routes/event.routes";
 import * as dotenv from "dotenv";
+import resourceRoutes from "./routes/resource.routes";
+import userRoutes from "./routes/user.routes";
 
 dotenv.config();
 
@@ -43,8 +48,13 @@ const speedLimiter = slowDown({
   },
 });
 
-app.use("/api/auth/login", speedLimiter, loginRateLimiter);
+app.use("/api/auth/login", loginRateLimiter, speedLimiter);
 app.use("/api/auth", authRoutes);
+app.use("/api/roles", roleRoutes);
+app.use("/api/permissions", permissionRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/resources", resourceRoutes);
+app.use("/api/users", userRoutes);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);

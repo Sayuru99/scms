@@ -10,7 +10,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
-    "seed": "ts-node src/seed/seed-permissions.ts"
+    "seed": "ts-node src/seed/seed-roles.ts"
   },
   "dependencies": {
     "@nestjs/swagger": "^11.0.6",

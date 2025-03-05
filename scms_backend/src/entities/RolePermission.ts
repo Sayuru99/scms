@@ -15,11 +15,11 @@ export class RolePermission {
   id!: string;
 
   @ApiProperty()
-  @ManyToOne(() => Role, (role) => role.permissions, { nullable: false })
+  @ManyToOne(() => Role, (role) => role.rolePermissions, { nullable: false })
   role!: Role;
 
   @ApiProperty()
-  @ManyToOne(() => Permission, (permission) => permission.roles, {
+  @ManyToOne(() => Permission, (permission) => permission.rolePermissions, {
     nullable: false,
   })
   permission!: Permission;

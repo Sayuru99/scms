@@ -19,7 +19,7 @@ export const generateAccessToken = (
     typeof expiry === "string" ? ms(expiry as ms.StringValue) / 1000 : expiry;
   const options: jwt.SignOptions = { expiresIn };
 
-  return jwt.sign({ id: user.id, role: user.role, scopes }, secret, options);
+  return jwt.sign({ id: user.id, scopes }, secret, options);
 };
 
 export const verifyAccessToken = (token: string): any => {

@@ -1,13 +1,14 @@
 import * as bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
 import { AppDataSource } from "../config/db.config";
-import { User, UserRole } from "../entities/User";
+import { User } from "../entities/User";
 import { Student } from "../entities/Student";
 import { Lecturer } from "../entities/Lecturer";
 import { Staff } from "../entities/Staff";
 import { Client } from "../entities/Client";
 import { AuthorizationCode } from "../entities/AuthorizationCode";
 import { Role } from "../entities/Role";
+import { Permission } from "../entities/Permission"; // Import Permission for typing
 import { generateAccessToken } from "../utils/jwtUtils";
 import {
   generateRefreshToken,
@@ -91,13 +92,17 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userRepo.findOne({
       where: { email },
-      relations: ["role", "role.permissions"],
+      relations: [
+        "role",
+        "role.rolePermissions",
+        "role.rolePermissions.permission",
+      ],
       select: ["id", "email", "password", "refreshToken"],
     });
     if (!user || !(await bcrypt.compare(password, user.password)))
       throw new Error("Invalid credentials");
 
-    const scopes = user.role.permissions.map((p) => p.name);
+    const scopes = user.role.rolePermissions.map((rp) => rp.permission.name);
     const accessToken = generateAccessToken(user, scopes);
     const refreshToken = generateRefreshToken(user, ip, scopes);
 
@@ -124,6 +129,11 @@ export class AuthService {
 
     const user = await this.userRepo.findOne({
       where: { email },
+      relations: [
+        "role",
+        "role.rolePermissions",
+        "role.rolePermissions.permission",
+      ],
       select: ["id", "email", "password", "role"],
     });
     if (!user || !(await bcrypt.compare(password, user.password)))
@@ -131,9 +141,10 @@ export class AuthService {
 
     const role = await this.roleRepo.findOne({
       where: { name: user.role.name },
-      relations: ["permissions"],
+      relations: ["rolePermissions", "rolePermissions.permission"],
     });
-    const availableScopes = role?.permissions.map((p) => p.name) || [];
+    const availableScopes =
+      role?.rolePermissions.map((rp) => rp.permission.name) || [];
     const requestedScopes = scope
       .split(" ")
       .filter((s) => availableScopes.includes(s));
@@ -162,7 +173,13 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const authCode = await this.authCodeRepo.findOne({
       where: { code },
-      relations: ["user", "client"],
+      relations: [
+        "user",
+        "user.role",
+        "user.role.rolePermissions",
+        "user.role.rolePermissions.permission",
+        "client",
+      ],
     });
     if (!authCode || authCode.expiresAt < new Date())
       throw new Error("Invalid or expired authorization code");
@@ -197,7 +214,11 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userRepo.findOne({
       where: { refreshToken: oldRefreshToken },
-      relations: ["role", "role.permissions"],
+      relations: [
+        "role",
+        "role.rolePermissions",
+        "role.rolePermissions.permission",
+      ],
       select: ["id", "lastLoginIp", "refreshToken"],
     });
     if (!user) throw new Error("Invalid refresh token");
@@ -205,7 +226,7 @@ export class AuthService {
       throw new Error("IP address mismatch with last login IP");
 
     const decoded = verifyRefreshToken(oldRefreshToken, ip);
-    const scopes = user.role.permissions.map((p) => p.name);
+    const scopes = user.role.rolePermissions.map((rp) => rp.permission.name);
 
     const accessToken = generateAccessToken(user, scopes);
     const newRefreshToken = generateRefreshToken(user, ip, scopes);
@@ -228,14 +249,22 @@ export class AuthService {
     userId: string,
     requiredScopes: string[]
   ): Promise<boolean> {
-    const user = await this.userRepo.findOne({ where: { id: userId } });
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      relations: [
+        "role",
+        "role.rolePermissions",
+        "role.rolePermissions.permission",
+      ],
+    });
     if (!user) return false;
 
     const role = await this.roleRepo.findOne({
       where: { name: user.role.name },
-      relations: ["permissions"],
+      relations: ["rolePermissions", "rolePermissions.permission"],
     });
-    const userScopes = role?.permissions.map((p) => p.name) || [];
+    const userScopes =
+      role?.rolePermissions.map((rp) => rp.permission.name) || [];
     return requiredScopes.every((scope) => userScopes.includes(scope));
   }
 }
