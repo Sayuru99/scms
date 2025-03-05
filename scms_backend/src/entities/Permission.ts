@@ -17,6 +17,9 @@ export class Permission {
   @Column({ length: 50 })
   category!: string;
 
+  @Column({ length: 50, nullable: true })
+  scope?: string;
+
   @Column({ type: "text" })
   description!: string;
 

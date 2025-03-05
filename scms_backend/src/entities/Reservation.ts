@@ -26,11 +26,18 @@ export class Reservation {
   @Column({ type: "datetime" })
   endTime!: Date;
 
-  @Column({ length: 20 })
+  @Column({
+    type: "enum",
+    enum: ["Pending", "Approved", "Rejected", "Cancelled"],
+    default: "Pending",
+  })
   status!: string;
 
   @Column({ type: "text", nullable: true })
-  notes?: string;
+  purpose?: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  approvedBy?: User;
 
   @Column({ name: "is_deleted", default: false })
   isDeleted!: boolean;

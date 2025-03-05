@@ -44,6 +44,9 @@ export class Event {
   @ManyToOne(() => User, { nullable: false })
   organizer!: User;
 
+  @ManyToOne(() => User, { nullable: true })
+  assignedTo?: User;
+
   @Column({ name: "is_deleted", default: false })
   isDeleted!: boolean;
 

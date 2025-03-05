@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Module } from "./Module";
+import { User } from "./User";
 
 @Entity("classes")
 export class Class {
@@ -27,6 +28,9 @@ export class Class {
     default: "Scheduled",
   })
   status!: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  reservedBy?: User;
 
   @Column({ name: "is_deleted", default: false })
   isDeleted!: boolean;

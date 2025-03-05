@@ -19,6 +19,9 @@ export class Message {
   @ManyToOne(() => Group, { nullable: true })
   group?: Group;
 
+  @ManyToOne(() => User, { nullable: true })
+  recipient?: User;
+
   @Column({ type: "text" })
   content!: string;
 

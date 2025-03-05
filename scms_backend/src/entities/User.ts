@@ -7,7 +7,6 @@ import {
   ManyToMany,
   JoinTable,
   Index,
-  ManyToOne,
 } from "typeorm";
 import { Role } from "./Role";
 import { Permission } from "./Permission";
@@ -45,6 +44,9 @@ export class User {
   @Column({ type: "simple-array", nullable: true })
   refreshTokens?: string[];
 
+  @Column({ name: "last_activity", type: "timestamp", nullable: true })
+  lastActivity?: Date;
+
   @ManyToMany(() => Role)
   @JoinTable({ name: "users_roles" })
   roles!: Role[];
@@ -58,7 +60,4 @@ export class User {
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt!: Date;
-
-  @ManyToOne(() => User, { nullable: true })
-  updatedBy?: User;
 }
