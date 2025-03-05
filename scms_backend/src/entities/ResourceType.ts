@@ -7,4 +7,7 @@ export class ResourceType {
 
   @Column({ length: 50 })
   type!: string;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
 }

@@ -15,6 +15,9 @@ export class Resource {
   @ManyToOne(() => ResourceType, { nullable: false })
   type!: ResourceType;
 
-  @ManyToOne(() => AvailabilityStatus, { nullable: false })
-  availabilityStatus!: AvailabilityStatus;
+  @Column({ name: "is_available", default: true })
+  isAvailable!: boolean;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
 }
