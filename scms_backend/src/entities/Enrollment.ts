@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
 import { Course } from "./Course";
@@ -22,6 +23,15 @@ export class Enrollment {
   @Column({ length: 20 })
   status!: string;
 
+  @Column({ length: 10, nullable: true })
+  grade?: string;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
+
   @CreateDateColumn({ name: "enrolled_at" })
   enrolledAt!: Date;
+
+  @UpdateDateColumn({ name: "updated_at" })
+  updatedAt!: Date;
 }
