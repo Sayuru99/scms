@@ -18,6 +18,16 @@ export class Class {
   @Column({ length: 100, nullable: true })
   location?: string;
 
-  @Column({ length: 20 })
+  @Column({ type: "int", nullable: true })
+  capacity?: number;
+
+  @Column({
+    type: "enum",
+    enum: ["Scheduled", "Ongoing", "Completed", "Cancelled"],
+    default: "Scheduled",
+  })
   status!: string;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
 }
