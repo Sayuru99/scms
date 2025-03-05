@@ -20,6 +20,12 @@ export class Permission {
   @Column({ type: "text" })
   description!: string;
 
+  @Column({ name: "is_active", default: true })
+  isActive!: boolean;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
 
