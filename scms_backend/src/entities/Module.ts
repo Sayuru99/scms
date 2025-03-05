@@ -16,6 +16,12 @@ export class Module {
   @Column({ length: 20 })
   semester!: string;
 
+  @Column({ type: "int", nullable: true })
+  credits?: number;
+
   @ManyToOne(() => User, { nullable: false })
   lecturer!: User;
+
+  @Column({ name: "is_deleted", default: false })
+  isDeleted!: boolean;
 }
