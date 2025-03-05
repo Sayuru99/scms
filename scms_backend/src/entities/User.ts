@@ -42,8 +42,8 @@ export class User {
   @Column({ name: "is_deleted", default: false })
   isDeleted!: boolean;
 
-  @Column({ type: "text", nullable: true })
-  refreshTokens?: string;
+  @Column({ type: "simple-array", nullable: true })
+  refreshTokens?: string[];
 
   @ManyToMany(() => Role)
   @JoinTable({ name: "users_roles" })
