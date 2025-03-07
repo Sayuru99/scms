@@ -27,12 +27,12 @@ function Sidebar() {
                       <BreadcrumbList>
                         <BreadcrumbItem className="hidden md:block">
                           <BreadcrumbLink href="#">
-                            Building Your Application
+                            Scheduling
                           </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator className="hidden md:block" />
                         <BreadcrumbItem>
-                          <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                          <BreadcrumbPage>Academic Calendar</BreadcrumbPage>
                         </BreadcrumbItem>
                       </BreadcrumbList>
                     </Breadcrumb>

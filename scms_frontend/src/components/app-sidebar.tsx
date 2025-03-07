@@ -27,15 +27,15 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
+    name: "Janani Balasooriya",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "Ace",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: "Campus",
     },
     {
       name: "Acme Corp.",
@@ -50,42 +50,34 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Courses",
       url: "#",
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: "History",
+          title: "HND",
           url: "#",
         },
         {
-          title: "Starred",
+          title: "Topup",
           url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
+        }
       ],
     },
     {
-      title: "Models",
+      title: "Reservation",
       url: "#",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
+          title: "Reserve",
           url: "#",
         },
         {
-          title: "Explorer",
+          title: "Return",
           url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+        }
       ],
     },
     {
