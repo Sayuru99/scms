@@ -1,27 +1,22 @@
-import './App.css'
-import { Button } from './components/ui/button'
 import {
-  Menubar,
-  MenubarCheckboxItem,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
-  MenubarTrigger,
-} from "@/components/ui/menubar"
+    Menubar,
+    MenubarCheckboxItem,
+    MenubarContent,
+    MenubarItem,
+    MenubarMenu,
+    MenubarRadioGroup,
+    MenubarRadioItem,
+    MenubarSeparator,
+    MenubarShortcut,
+    MenubarSub,
+    MenubarSubContent,
+    MenubarSubTrigger,
+    MenubarTrigger,
+  } from "@/components/ui/menubar"
 
-
-
-function App() {
-  return (
- <main>
-  <Menubar>
+function Navigation() {
+    return (
+        <Menubar>
     <MenubarMenu>
       <MenubarTrigger>File</MenubarTrigger>
       <MenubarContent>
@@ -108,12 +103,7 @@ function App() {
       </MenubarContent>
     </MenubarMenu>
   </Menubar>
-     <div className="flex flex-col min-h-svh justify-around items-center">
-      <Button>Click me</Button>
-    </div>
-    
- </main>
-  )
-}
+    );
+};
 
-export default App
+export default Navigation;
