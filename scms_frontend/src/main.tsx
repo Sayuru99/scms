@@ -6,7 +6,8 @@ import Login from './pages/auth/Login.tsx'
 import {RouterProvider, createBrowserRouter} from 'react-router-dom'
 import RootLayout from './layouts/root.layout.tsx';
 import MainLayout from './layouts/main.layout.tsx'
-import AdminDashboard from './pages/dashboard/AdminDashboard.tsx'
+import AdminDashboard from './pages/admin/AdminDashboard.tsx'
+import StudentDashboard from './pages/student/StudentDashboard.tsx'
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
             element: <AdminDashboard />,
           }
         ],
+      },
+      {
+        path: "/student_dashboard",
+        element: <StudentDashboard />,
       },
       {
         path: "/",
