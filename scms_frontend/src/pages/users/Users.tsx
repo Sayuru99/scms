@@ -23,11 +23,9 @@ function Users() {
 
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
-    // console.log(accessToken);
     if (accessToken) {
       try {
         const decoded: JwtPayload = jwtDecode(accessToken);
-        // console.log(decoded);
         setPermissions(decoded.permissions || []);
         fetchUsers(accessToken);
       } catch (err) {
