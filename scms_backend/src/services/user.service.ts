@@ -17,6 +17,13 @@ interface UserUpdateParams {
   directPermissionNames?: string[];
 }
 
+interface SelfUpdateParams {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+}
+
 export class UserService {
   private userRepo = AppDataSource.getRepository(User);
   private roleRepo = AppDataSource.getRepository(Role);
@@ -155,5 +162,36 @@ export class UserService {
     await this.userRepo.save(user);
     logger.info(`User soft-deleted: ${userId}`);
     return userId;
+  }
+
+  async updateSelf(userId: string, updates: SelfUpdateParams) {
+    const user = await this.userRepo.findOne({
+      where: { id: userId, isDeleted: false },
+      relations: ["role", "role.permissions"],
+    });
+    if (!user) {
+      logger.warn(`Self-update failed, user not found: ${userId}`);
+      throw new NotFoundError("User not found");
+    }
+
+    if (updates.email) {
+      const existingUser = await this.userRepo.findOneBy({
+        email: updates.email,
+      });
+      if (existingUser && existingUser.id !== userId) {
+        logger.warn(`Email already in use: ${updates.email}`);
+        throw new BadRequestError("Email already in use");
+      }
+      user.email = updates.email;
+    }
+
+    if (updates.firstName) user.firstName = updates.firstName;
+    if (updates.lastName) user.lastName = updates.lastName;
+    if (updates.phoneNumber !== undefined)
+      user.phoneNumber = updates.phoneNumber;
+
+    await this.userRepo.save(user);
+    logger.info(`User self-updated: ${userId}`);
+    return user.id;
   }
 }

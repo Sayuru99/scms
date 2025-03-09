@@ -100,6 +100,23 @@ export const userService = {
       token,
       true
     ),
+
+  updateSelf: (
+    updates: {
+      email: string;
+      firstName: string;
+      lastName: string;
+      phoneNumber: string;
+    },
+    token: string
+  ) =>
+    apiRequest<{ message: string; userId: string }>(
+      `/api/users/me`,
+      "PUT",
+      updates,
+      token,
+      true
+    ),
 };
 
 export const roleService = {

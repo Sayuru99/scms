@@ -87,4 +87,26 @@ router.delete(
   }
 );
 
+router.put(
+  "/me",
+  authMiddleware(),
+  async (req, res, next) => {
+    try {
+      const userId = req.user!.userId;
+      const updates = {
+        email: req.body.email,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        phoneNumber: req.body.phoneNumber,
+      };
+
+      const updatedUserId = await userService.updateSelf(userId, updates);
+      res.json({ message: "Profile updated successfully", userId: updatedUserId });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+
 export default router;
