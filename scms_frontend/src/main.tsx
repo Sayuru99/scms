@@ -1,36 +1,50 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import Home from "./pages/home/Home.tsx";
+import Dashboard from "./pages/dashboard/Dashboard.tsx";
 import Login from "./pages/auth/Login.tsx";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import RootLayout from "./layouts/root.layout.tsx";
 import MainLayout from "./layouts/main.layout.tsx";
-import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import StudentDashboard from "./pages/student/StudentDashboard.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import Users from "./pages/users/Users.tsx"; 
 
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
       {
-        element: <MainLayout />,
+        element: <ProtectedRoute />,
         children: [
           {
-            path: "/admin_dashboard",
-            element: <AdminDashboard />,
+            element: <MainLayout />,
+            children: [
+              {
+                path: "/",
+                element: <Dashboard />,
+              },
+              {
+                path: "/users",
+                element: <Users />, 
+              },
+              {
+                path: "/events",
+                element: <div>Events (TBD)</div>, 
+              },
+              {
+                path: "/calendar",
+                element: <div>Calendar (TBD)</div>, 
+              },
+              {
+                path: "/student_dashboard",
+                element: <StudentDashboard />,
+              },
+            ],
           },
         ],
-      },
-      {
-        path: "/student_dashboard",
-        element: <StudentDashboard />,
-      },
-      {
-        path: "/",
-        element: <Home />,
       },
       {
         path: "/login",
@@ -44,8 +58,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
     <ToastContainer
-      position="top-right" 
-      autoClose={3000} 
+      position="top-right"
+      autoClose={3000}
       hideProgressBar={false}
       newestOnTop={true}
       closeOnClick
@@ -53,7 +67,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       pauseOnFocusLoss
       draggable
       pauseOnHover
-      theme="light" 
+      theme="light"
     />
   </StrictMode>
 );

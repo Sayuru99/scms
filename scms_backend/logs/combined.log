@@ -37,3 +37,9 @@
 {"email":"admin@scms.com","level":"info","message":"Raw request body:","password":"admin123","timestamp":"2025-03-09 14:27:20"}
 {"email":"admin@scms.com","level":"info","message":"DTO before validation:","password":"admin123","timestamp":"2025-03-09 14:27:20"}
 {"level":"info","message":"User logged in: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 14:27:20"}
+{"email":"admin@scms.com","level":"info","message":"Raw request body:","password":"admin123","timestamp":"2025-03-09 16:16:02"}
+{"email":"admin@scms.com","level":"info","message":"DTO before validation:","password":"admin123","timestamp":"2025-03-09 16:16:02"}
+{"level":"info","message":"User logged in: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 16:16:02"}
+{"email":"admin@scms.com","level":"info","message":"Raw request body:","password":"admin123","timestamp":"2025-03-09 16:33:46"}
+{"email":"admin@scms.com","level":"info","message":"DTO before validation:","password":"admin123","timestamp":"2025-03-09 16:33:46"}
+{"level":"info","message":"User logged in: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 16:33:47"}
