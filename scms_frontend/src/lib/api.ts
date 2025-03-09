@@ -29,27 +29,25 @@ async function apiRequest<T>(
 
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, config);
-    const result = await response.json();
-
     if (!response.ok) {
-      const errorMessage = (result as ApiError).message || "Request failed";
+      const text = await response.text();
+      const errorMessage = text.includes("<!DOCTYPE")
+        ? `Request failed: ${response.status} ${response.statusText}`
+        : (JSON.parse(text) as ApiError).message || "Request failed";
       toast.error(errorMessage);
       throw new Error(errorMessage);
     }
 
+    const result = await response.json();
     if (showSuccess) {
       toast.success("Operation completed successfully");
     }
-
     return result as T;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
-    } else {
-      throw new Error("An error occurred");
     }
-
-    throw error;
+    throw new Error("An error occurred");
   }
 }
 
@@ -87,7 +85,7 @@ export const userService = {
 
   updateUser: (userId: string, updates: UpdateUserData, token: string) =>
     apiRequest<{ message: string; userId: string }>(
-      "/api/users/" + userId,
+      `/api/users/${userId}`,
       "PUT",
       updates,
       token,
@@ -96,7 +94,95 @@ export const userService = {
 
   deleteUser: (userId: string, token: string) =>
     apiRequest<{ message: string; userId: string }>(
-      "/api/users/" + userId,
+      `/api/users/${userId}`,
+      "DELETE",
+      undefined,
+      token,
+      true
+    ),
+};
+
+export const roleService = {
+  createRole: (
+    name: string,
+    description: string | undefined,
+    permissionNames: string[],
+    token: string
+  ) =>
+    apiRequest<{ message: string; roleId: string }>(
+      "/api/roles",
+      "POST",
+      { name, description, permissionNames },
+      token,
+      true
+    ),
+
+  getRoles: (token: string) =>
+    apiRequest<Role[]>("/api/roles", "GET", undefined, token),
+
+  updateRole: (
+    roleId: string,
+    name: string,
+    description: string | undefined,
+    permissionNames: string[],
+    token: string
+  ) =>
+    apiRequest<{ message: string; roleId: string }>(
+      `/api/roles/${roleId}`,
+      "PUT",
+      { name, description, permissionNames },
+      token,
+      true
+    ),
+
+  deleteRole: (roleId: string, token: string) =>
+    apiRequest<{ message: string; roleId: string }>(
+      `/api/roles/${roleId}`,
+      "DELETE",
+      undefined,
+      token,
+      true
+    ),
+};
+
+export const permissionService = {
+  createPermission: (
+    name: string,
+    category: string,
+    scope: string | undefined,
+    description: string,
+    token: string
+  ) =>
+    apiRequest<{ message: string; permissionId: string }>(
+      "/api/permissions",
+      "POST",
+      { name, category, scope, description },
+      token,
+      true
+    ),
+
+  getPermissions: (token: string) =>
+    apiRequest<Permission[]>("/api/permissions", "GET", undefined, token),
+
+  updatePermission: (
+    permissionId: string,
+    name: string,
+    category: string,
+    scope: string | undefined,
+    description: string,
+    token: string
+  ) =>
+    apiRequest<{ message: string; permissionId: string }>(
+      `/api/permissions/${permissionId}`,
+      "PUT",
+      { name, category, scope, description },
+      token,
+      true
+    ),
+
+  deletePermission: (permissionId: string, token: string) =>
+    apiRequest<{ message: string; permissionId: string }>(
+      `/api/permissions/${permissionId}`,
       "DELETE",
       undefined,
       token,
@@ -110,7 +196,7 @@ export interface User {
   firstName: string;
   lastName: string;
   phoneNumber?: string;
-  role: { name: string };
+  role: Role;
   directPermissions?: string;
   isActive: boolean;
   isFirstLogin: boolean;
@@ -134,4 +220,26 @@ export interface UpdateUserData {
   phoneNumber?: string;
   roleName?: string;
   directPermissionNames?: string[];
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  description?: string;
+  permissions: Permission[];
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Permission {
+  id: string;
+  name: string;
+  category: string;
+  scope?: string;
+  description: string;
+  isActive: boolean;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

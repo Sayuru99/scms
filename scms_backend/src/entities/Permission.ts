@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
 } from "typeorm";
+import { Role } from "./Role";
 
 @Entity("permissions")
 export class Permission {
@@ -28,6 +30,9 @@ export class Permission {
 
   @Column({ name: "is_deleted", default: false })
   isDeleted!: boolean;
+
+  @ManyToMany(() => Role, (role) => role.permissions)
+  roles!: Role[];
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;

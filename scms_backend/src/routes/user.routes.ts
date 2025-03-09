@@ -8,7 +8,7 @@ import logger from "../config/logger";
 const router = Router();
 const userService = new UserService();
 
-router.post("/", authMiddleware("crud:users"), async (req, res, next) => {
+router.post("/", authMiddleware("create:users"), async (req, res, next) => {
   try {
     const dto = Object.assign(new CreateUserDto(), req.body);
     const errors = await validate(dto);
@@ -34,7 +34,7 @@ router.post("/", authMiddleware("crud:users"), async (req, res, next) => {
   }
 });
 
-router.get("/", authMiddleware("crud:users"), async (req, res, next) => {
+router.get("/", authMiddleware("read:users"), async (req, res, next) => {
   try {
     const users = await userService.getUsers();
     res.json(users);
@@ -43,36 +43,40 @@ router.get("/", authMiddleware("crud:users"), async (req, res, next) => {
   }
 });
 
-router.put("/:userId", authMiddleware("crud:users"), async (req, res, next) => {
-  try {
-    const dto = Object.assign(new UpdateUserDto(), req.body);
-    const errors = await validate(dto);
-    if (errors.length > 0) {
-      logger.warn(
-        `Validation failed for user update ${
-          req.params.userId
-        }: ${JSON.stringify(errors)}`
-      );
-      return res.status(400).json({ message: "Validation failed", errors });
-    }
+router.put(
+  "/:userId",
+  authMiddleware("update:users"),
+  async (req, res, next) => {
+    try {
+      const dto = Object.assign(new UpdateUserDto(), req.body);
+      const errors = await validate(dto);
+      if (errors.length > 0) {
+        logger.warn(
+          `Validation failed for user update ${
+            req.params.userId
+          }: ${JSON.stringify(errors)}`
+        );
+        return res.status(400).json({ message: "Validation failed", errors });
+      }
 
-    const userId = await userService.updateUser(req.params.userId, {
-      email: dto.email,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      phoneNumber: dto.phoneNumber,
-      roleName: dto.roleName,
-      directPermissionNames: dto.directPermissionNames,
-    });
-    res.json({ message: "User updated successfully", userId });
-  } catch (error) {
-    next(error);
+      const userId = await userService.updateUser(req.params.userId, {
+        email: dto.email,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        phoneNumber: dto.phoneNumber,
+        roleName: dto.roleName,
+        directPermissionNames: dto.directPermissionNames,
+      });
+      res.json({ message: "User updated successfully", userId });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.delete(
   "/:userId",
-  authMiddleware("crud:users"),
+  authMiddleware("delete:users"),
   async (req, res, next) => {
     try {
       const userId = await userService.deleteUser(req.params.userId);

@@ -43,7 +43,7 @@ export class User {
   @Column({ name: "last_activity", type: "timestamp", nullable: true })
   lastActivity?: Date;
 
-  @ManyToOne(() => Role, { nullable: true })
+  @ManyToOne(() => Role, (role) => role.id, { nullable: true })
   role!: Role;
 
   @Column({ type: "text", nullable: true })

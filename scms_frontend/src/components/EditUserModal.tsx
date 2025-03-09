@@ -1,12 +1,13 @@
-import { useState } from "react"; 
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { User, userService } from "@/lib/api";
+import { User, userService, roleService, permissionService, Role, Permission } from "@/lib/api";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface EditUserModalProps {
   user: User;
@@ -15,7 +16,30 @@ interface EditUserModalProps {
 }
 
 function EditUserModal({ user, onClose, onUserUpdated }: EditUserModalProps) {
-  const [editUser, setEditUser] = useState<User>({ ...user });
+  const [editUser, setEditUser] = useState<User>({
+    ...user,
+    directPermissions: user.directPermissions || "",
+  });
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = Cookies.get("accessToken");
+      if (!token) return;
+
+      try {
+        const fetchedRoles = await roleService.getRoles(token);
+        const fetchedPermissions = await permissionService.getPermissions(token);
+        setRoles(fetchedRoles);
+        setPermissions(fetchedPermissions);
+      } catch (err) {
+        console.error("Failed to fetch roles or permissions:", err);
+        toast.error("Failed to load roles or permissions");
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +47,7 @@ function EditUserModal({ user, onClose, onUserUpdated }: EditUserModalProps) {
     if (!token) return;
 
     try {
+      const directPermissionNames = editUser.directPermissions?.split(",").filter(Boolean) || [];
       await userService.updateUser(
         editUser.id,
         {
@@ -31,7 +56,7 @@ function EditUserModal({ user, onClose, onUserUpdated }: EditUserModalProps) {
           lastName: editUser.lastName,
           phoneNumber: editUser.phoneNumber,
           roleName: editUser.role.name,
-          directPermissionNames: editUser.directPermissions?.split(","),
+          directPermissionNames: directPermissionNames.length > 0 ? directPermissionNames : undefined,
         },
         token
       );
@@ -98,12 +123,36 @@ function EditUserModal({ user, onClose, onUserUpdated }: EditUserModalProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Admin">Admin</SelectItem>
-                <SelectItem value="Lecturer">Lecturer</SelectItem>
-                <SelectItem value="Student">Student</SelectItem>
-                <SelectItem value="Staff">Staff</SelectItem>
+                {roles.map((role) => (
+                  <SelectItem key={role.id} value={role.name}>
+                    {role.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <Label>Direct Permissions</Label>
+            <div className="max-h-40 overflow-y-auto border rounded-md p-2">
+              {permissions.map((perm) => (
+                <div key={perm.id} className="flex items-center space-x-2 py-1">
+                  <Checkbox
+                    id={perm.id}
+                    checked={editUser.directPermissions?.split(",").includes(perm.name) || false}
+                    onCheckedChange={(checked) => {
+                      const currentPermissions = editUser.directPermissions?.split(",").filter(Boolean) || [];
+                      setEditUser({
+                        ...editUser,
+                        directPermissions: checked
+                          ? [...currentPermissions, perm.name].join(",")
+                          : currentPermissions.filter((p) => p !== perm.name).join(","),
+                      });
+                    }}
+                  />
+                  <Label htmlFor={perm.id}>{perm.name} ({perm.category})</Label>
+                </div>
+              ))}
+            </div>
           </div>
           <div>
             <Button type="button" variant="outline" onClick={() => alert("Reset Password TBD")}>

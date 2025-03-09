@@ -10,6 +10,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import Users from "./pages/users/Users.tsx";
+import Permissions from "./pages/permissions/Permissions.tsx";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
               {
                 path: "/events",
                 element: <div>Events (TBD)</div>,
+              },
+              {
+                path: "/permissions",
+                element: <Permissions />,
               },
               {
                 path: "/calendar",
