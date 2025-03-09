@@ -4,12 +4,6 @@ import { jwtDecode } from "jwt-decode";
 import { userService, authService } from "@/lib/api";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { User } from "@/lib/api";
@@ -188,14 +182,38 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Profile Sidebar */}
-      <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Your Profile</DialogTitle>
-          </DialogHeader>
+      <div
+        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
+          isProfileOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-6 flex flex-col h-full">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold">Your Profile</h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsProfileOpen(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </Button>
+          </div>
+
           {userDetails ? (
-            <form onSubmit={handleProfileUpdate} className="space-y-4">
+            <form onSubmit={handleProfileUpdate} className="space-y-4 flex-grow">
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -239,18 +257,32 @@ function Dashboard() {
                   }
                 />
               </div>
-              <div className="flex justify-between items-center">
-                <Button type="submit">Save Changes</Button>
-                <Button variant="destructive" onClick={handleLogout}>
-                  Logout
-                </Button>
-              </div>
+              <Button type="submit" className="w-full">
+                Update
+              </Button>
             </form>
           ) : (
-            <p>Loading profile...</p>
+            <p className="flex-grow">Loading profile...</p>
           )}
-        </DialogContent>
-      </Dialog>
+
+          <div className="mt-6">
+            <Button
+              variant="outline"
+              className="w-full text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {isProfileOpen && (
+        <div
+          className="fixed inset-0 backdrop-blur-sm z-40"
+          onClick={() => setIsProfileOpen(false)}
+        />
+      )}
     </div>
   );
 }
