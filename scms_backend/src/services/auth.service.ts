@@ -28,6 +28,10 @@ export class AuthService {
     }
 
     const permissions = await this.getUserPermissions(user);
+    logger.info(
+      `Permissions for user ${user.id}: ${JSON.stringify(permissions)}`
+    );
+
     const accessToken = this.generateAccessToken(user, permissions);
     const refreshToken = this.generateRefreshToken(user);
 

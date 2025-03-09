@@ -26,6 +26,7 @@ function Users() {
     if (accessToken) {
       try {
         const decoded: JwtPayload = jwtDecode(accessToken);
+        // console.log(decoded.permissions);
         setPermissions(decoded.permissions || []);
         fetchUsers(accessToken);
       } catch (err) {
@@ -56,7 +57,7 @@ function Users() {
     }
   }, [roleFilter, users]);
 
-  if (!permissions.includes("crud:users")) {
+  if (!permissions.includes("read:users")) {
     return <div className="text-red-600">Access Denied: You don’t have permission to view this page.</div>;
   }
 
@@ -69,7 +70,9 @@ function Users() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Users</h1>
-        <AddUserModal onUserAdded={handleUserAdded} />
+        {permissions.includes("create:users") && (
+          <AddUserModal onUserAdded={handleUserAdded} />
+        )}
       </div>
       <UserCards users={users} />
       <UserList

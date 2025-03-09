@@ -26,7 +26,8 @@ function Dashboard() {
     if (accessToken) {
       try {
         const decoded: JwtPayload = jwtDecode(accessToken);
-        setUserName(decoded.userId);
+        // console.log(decoded);
+        setUserName(decoded.role);
         setPermissions(decoded.permissions || []);
       } catch (err) {
         console.error("Failed to decode token:", err);
