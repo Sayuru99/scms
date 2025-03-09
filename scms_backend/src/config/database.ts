@@ -27,7 +27,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_DATABASE || "scms_group_eight",
   synchronize: false,
-  logging: process.env.NODE_ENV === "development",
+  logging: process.env.NODE_ENV === "production" ? false : ["error", "query"],
   entities: [
     User,
     Role,

@@ -1,65 +1,47 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { User } from "../entities/User";
-import { AppDataSource } from "../config/database";
-import { UnauthorizedError } from "../utils/errors";
+import logger from "../config/logger";
 
-export interface AuthRequest extends Request {
-  user?: User;
+interface JwtPayload {
+  userId: string;
+  role: string | null;
+  permissions: string[];
 }
 
-export const authMiddleware = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      throw new UnauthorizedError("No token provided");
+export const authMiddleware = (requiredPermission?: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      logger.warn("No token provided");
+      return res.status(401).json({ message: "No token provided" });
     }
 
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-
-    const user = await AppDataSource.getRepository(User)
-      .createQueryBuilder("user")
-      .leftJoinAndSelect("user.roles", "roles")
-      .leftJoinAndSelect("roles.permissions", "rolePermissions")
-      .leftJoinAndSelect("user.directPermissions", "directPermissions")
-      .where("user.id = :id", { id: decoded.userId })
-      .getOne();
-
-    if (!user) {
-      throw new UnauthorizedError("User not found");
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const checkPermission = (requiredPermission: string) => {
-  return async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const user = req.user;
-      if (!user) {
-        throw new UnauthorizedError("User not authenticated");
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+      req.user = decoded;
+
+      if (
+        requiredPermission &&
+        (!decoded.permissions || !decoded.permissions.includes(requiredPermission))
+      ) {
+        logger.warn(`Insufficient permissions for user ${decoded.userId}: ${requiredPermission}`);
+        return res.status(403).json({ message: "Insufficient permissions" });
       }
 
-      const hasPermission = user.roles.some(role =>
-        role.permissions.some(permission => permission.name === requiredPermission)
-      ) || user.directPermissions.some(permission => permission.name === requiredPermission);
-
-      if (!hasPermission) {
-        throw new UnauthorizedError("Permission denied");
-      }
-
+      logger.debug(`Authenticated user: ${decoded.userId}`);
       next();
     } catch (error) {
-      next(error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      logger.error(`Invalid token: ${errorMessage}`);
+      res.status(401).json({ message: "Invalid token" });
     }
   };
 };
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JwtPayload;
+    }
+  }
+}

@@ -4,12 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
-  Index,
+  ManyToOne,
 } from "typeorm";
 import { Role } from "./Role";
-import { Permission } from "./Permission";
 
 @Entity("users")
 export class User {
@@ -40,19 +37,17 @@ export class User {
   @Column({ name: "is_deleted", default: false })
   isDeleted!: boolean;
 
-  @Column({ type: "simple-array", nullable: true })
-  refreshTokens?: string[];
+  @Column({ type: "text", nullable: true })
+  refreshTokens?: string;
 
   @Column({ name: "last_activity", type: "timestamp", nullable: true })
   lastActivity?: Date;
 
-  @ManyToMany(() => Role)
-  @JoinTable({ name: "users_roles" })
-  roles!: Role[];
+  @ManyToOne(() => Role, { nullable: true })
+  role!: Role;
 
-  @ManyToMany(() => Permission)
-  @JoinTable({ name: "users_permissions" })
-  directPermissions!: Permission[];
+  @Column({ type: "text", nullable: true })
+  directPermissions?: string;
 
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;

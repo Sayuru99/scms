@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "description": "Management System for Smart Campus",
   "main": "src/index.ts",
-"scripts": {
-  "start": "ts-node src/index.ts",
-  "dev": "nodemon src/index.ts",
-  "build": "tsc",
-
-  "test": "jest"
-},
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "npm run typeorm -- migration:generate src/migrations/InitialSchema -d src/config/database.ts",
+    "migration:run": "npm run typeorm -- migration:run -d src/config/database.ts",
+    "seed": "ts-node src/seed.ts",
+    "test": "jest"
+  },
   "dependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.0",
@@ -27,7 +30,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "typeorm": "^0.3.19",
-    "winston": "^3.11.0"
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
