@@ -5,7 +5,7 @@ import {
   FaUsers,         
   FaCalendarAlt,   
   FaBullhorn       
-} from "react-icons/fa";
+} from "react-icons/fa";  
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true); 
