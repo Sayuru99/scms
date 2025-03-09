@@ -43,3 +43,34 @@
 {"email":"admin@scms.com","level":"info","message":"Raw request body:","password":"admin123","timestamp":"2025-03-09 16:33:46"}
 {"email":"admin@scms.com","level":"info","message":"DTO before validation:","password":"admin123","timestamp":"2025-03-09 16:33:46"}
 {"level":"info","message":"User logged in: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 16:33:47"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 17:19:55"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 17:19:55"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 18:06:05"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 18:06:05"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:16:40"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:16:40"}
+{"level":"info","message":"User updated: f19edefc-e9b2-4abb-9ecc-0d682e135995","timestamp":"2025-03-09 18:19:10"}
+{"level":"info","message":"User updated: f19edefc-e9b2-4abb-9ecc-0d682e135995","timestamp":"2025-03-09 18:19:24"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:19:35"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:19:35"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 18:27:00"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 18:27:00"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:27:00"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:27:00"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:31:35"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:31:35"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:31:54"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:31:54"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:32:21"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:32:21"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:32:30"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:32:30"}
+{"email":"admin@scms.com","level":"info","message":"Raw request body:","password":"admin123","timestamp":"2025-03-09 18:34:12"}
+{"email":"admin@scms.com","level":"info","message":"DTO before validation:","password":"admin123","timestamp":"2025-03-09 18:34:12"}
+{"level":"info","message":"User logged in: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 18:34:12"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:35:23"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:35:23"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:36:56"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:36:56"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:37:35"}
+{"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 18:37:35"}
