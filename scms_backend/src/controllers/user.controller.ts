@@ -36,4 +36,30 @@ export class UserController {
       next(error);
     }
   }
+
+  async updateSelf(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.userId;
+      const updates = {
+        email: req.body.email,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        phoneNumber: req.body.phoneNumber,
+      };
+
+      if (!updates.email || !updates.firstName || !updates.lastName) {
+        return res
+          .status(400)
+          .json({ message: "Email, first name, and last name are required" });
+      }
+
+      const updatedUserId = await this.userService.updateSelf(userId, updates);
+      res.json({
+        message: "Profile updated successfully",
+        userId: updatedUserId,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
