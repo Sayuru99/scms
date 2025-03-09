@@ -164,3 +164,4 @@
     @apply bg-background text-foreground;
   }
 }
+@import "react-toastify/dist/ReactToastify.css";

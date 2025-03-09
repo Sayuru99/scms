@@ -13,20 +13,25 @@ config();
 
 const app = express();
 
+app.use(express.json());
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Authorization", "Content-Type"],
   })
 );
+
+app.options("*", cors());
 
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
-app.use(express.json());
+
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -48,4 +53,4 @@ AppDataSource.initialize()
       console.log(`Server is running on port ${PORT}`);
     });
   })
-  .catch((error) => console.log(error));
+  .catch((error) => console.log("Database connection error:", error));
