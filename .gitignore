@@ -3,5 +3,6 @@ scms_backend/node_modules/
 seed/
 migrations/
 scms_backend/src/seed.ts
+scms_backend/logs/
 scms_backend/logs/error.log
 scms_backend/logs/combined.log
