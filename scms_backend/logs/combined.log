@@ -134,3 +134,45 @@
 {"level":"info","message":"Fetched 2 users","timestamp":"2025-03-09 19:29:55"}
 {"level":"info","message":"User created: 050621d4-2562-4cfa-8cdc-cfa76c595497","timestamp":"2025-03-09 19:38:37"}
 {"level":"info","message":"User updated: 050621d4-2562-4cfa-8cdc-cfa76c595497","timestamp":"2025-03-09 19:39:09"}
+{"level":"warn","message":"Invalid refresh token attempt for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 20:07:08"}
+{"level":"warn","message":"UnauthorizedError: Invalid refresh token","timestamp":"2025-03-09 20:07:08"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 20:07:08"}
+{"level":"error","message":"Unexpected error: Property \"permissions\" was not found in \"Role\". Make sure your query is correct.","stack":"EntityPropertyNotFoundError: Property \"permissions\" was not found in \"Role\". Make sure your query is correct.\n    at C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3932:23\n    at Array.forEach (<anonymous>)\n    at SelectQueryBuilder.buildRelations (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3924:32)\n    at C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3994:26\n    at Array.forEach (<anonymous>)\n    at SelectQueryBuilder.buildRelations (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3924:32)\n    at SelectQueryBuilder.applyFindOptions (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3113:22)\n    at SelectQueryBuilder.setFindOptions (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:105:14)\n    at EntityManager.find (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\entity-manager\\EntityManager.ts:1106:14)\n    at Repository.find (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\repository\\Repository.ts:544:29)","timestamp":"2025-03-09 20:07:08"}
+{"level":"error","message":"Unexpected error: Property \"permissions\" was not found in \"Role\". Make sure your query is correct.","stack":"EntityPropertyNotFoundError: Property \"permissions\" was not found in \"Role\". Make sure your query is correct.\n    at C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3932:23\n    at Array.forEach (<anonymous>)\n    at SelectQueryBuilder.buildRelations (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3924:32)\n    at C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3994:26\n    at Array.forEach (<anonymous>)\n    at SelectQueryBuilder.buildRelations (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3924:32)\n    at SelectQueryBuilder.applyFindOptions (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:3113:22)\n    at SelectQueryBuilder.setFindOptions (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\query-builder\\SelectQueryBuilder.ts:105:14)\n    at EntityManager.find (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\entity-manager\\EntityManager.ts:1106:14)\n    at Repository.find (C:\\Everything\\Uni\\SDP\\scms_backend\\node_modules\\src\\repository\\Repository.ts:544:29)","timestamp":"2025-03-09 20:07:08"}
+{"email":"admin@scms.com","level":"info","message":"Raw request body:","password":"admin123","timestamp":"2025-03-09 20:20:08"}
+{"email":"admin@scms.com","level":"info","message":"DTO before validation:","password":"admin123","timestamp":"2025-03-09 20:20:08"}
+{"level":"info","message":"User logged in: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 20:20:09"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:24:21"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:24:21"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:26:31"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:26:31"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:29:36"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:29:36"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:29:38"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:29:38"}
+{"level":"info","message":"Fetched 9 permissions","timestamp":"2025-03-09 20:29:38"}
+{"level":"info","message":"Fetched 9 permissions","timestamp":"2025-03-09 20:29:38"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:29:50"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:29:50"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:29:53"}
+{"level":"info","message":"Fetched 9 permissions","timestamp":"2025-03-09 20:29:53"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:30:18"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:30:18"}
+{"level":"info","message":"Fetched 9 permissions","timestamp":"2025-03-09 20:30:18"}
+{"level":"info","message":"Fetched 9 permissions","timestamp":"2025-03-09 20:30:18"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:30:46"}
+{"level":"info","message":"Fetched 3 users","timestamp":"2025-03-09 20:30:46"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:30:50"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:30:50"}
+{"level":"info","message":"Fetched 9 permissions","timestamp":"2025-03-09 20:30:50"}
+{"level":"info","message":"Fetched 9 permissions","timestamp":"2025-03-09 20:30:50"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 20:40:51"}
+{"level":"info","message":"Token refreshed for user: 6ae18774-5595-48f5-84d8-b7eacec71544","timestamp":"2025-03-09 20:40:51"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:40:55"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:40:55"}
+{"level":"info","message":"Fetched 27 permissions","timestamp":"2025-03-09 20:40:55"}
+{"level":"info","message":"Fetched 27 permissions","timestamp":"2025-03-09 20:40:55"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:53:31"}
+{"level":"info","message":"Fetched 4 roles","timestamp":"2025-03-09 20:53:31"}
+{"level":"info","message":"Fetched 27 permissions","timestamp":"2025-03-09 20:53:31"}
+{"level":"info","message":"Fetched 27 permissions","timestamp":"2025-03-09 20:53:31"}

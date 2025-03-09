@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn } from "react-icons/fa";
+import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn, FaLock } from "react-icons/fa";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
@@ -28,13 +28,14 @@ const Sidebar = () => {
   }, []);
 
   const menuItems = [
-    { name: "Dashboard", path: "/", icon: <FaTachometerAlt className="w-5 h-5" />, requiredPermission: null }, // Always visible
-    { name: "Users", path: "/users", icon: <FaUsers className="w-5 h-5" />, requiredPermission: "crud:users" },
-    { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "view:events" },
-    { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "view:calendar" },
+    { name: "Dashboard", path: "/", icon: <FaTachometerAlt className="w-5 h-5" />, requiredPermission: null },
+    { name: "Users", path: "/users", icon: <FaUsers className="w-5 h-5" />, requiredPermission: "read:users" },
+    { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
+    { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" }, 
+    { name: "Permissions", path: "/permissions", icon: <FaLock className="w-5 h-5" />, requiredPermission: "read:roles" },
   ];
 
-  const filteredMenuItems = menuItems.filter((item) => 
+  const filteredMenuItems = menuItems.filter((item) =>
     item.requiredPermission === null || permissions.includes(item.requiredPermission)
   );
 

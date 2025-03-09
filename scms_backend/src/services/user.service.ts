@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import { BadRequestError, NotFoundError } from "../utils/errors";
 import logger from "../config/logger";
 import { Role } from "../entities/Role";
-import { Permission } from "../entities/Permission"; 
-import { In } from "typeorm"; 
+import { Permission } from "../entities/Permission";
+import { In } from "typeorm";
 
 interface UserUpdateParams {
   email?: string;
@@ -20,7 +20,7 @@ interface UserUpdateParams {
 export class UserService {
   private userRepo = AppDataSource.getRepository(User);
   private roleRepo = AppDataSource.getRepository(Role);
-  private permRepo = AppDataSource.getRepository(Permission); 
+  private permRepo = AppDataSource.getRepository(Permission);
 
   async createUser(
     email: string,
@@ -37,7 +37,10 @@ export class UserService {
       throw new BadRequestError("User already exists");
     }
 
-    const role = await this.roleRepo.findOneBy({ name: roleName });
+    const role = await this.roleRepo.findOne({
+      where: { name: roleName },
+      relations: ["permissions"],
+    });
     if (!role) {
       logger.warn(`Invalid role name: ${roleName}`);
       throw new BadRequestError("Invalid role name");
@@ -46,7 +49,7 @@ export class UserService {
     let directPermissions: Permission[] = [];
     if (directPermissionNames && directPermissionNames.length > 0) {
       directPermissions = await this.permRepo.find({
-        where: { name: In(directPermissionNames) }, 
+        where: { name: In(directPermissionNames) },
       });
       if (directPermissions.length !== directPermissionNames.length) {
         logger.warn(`Invalid permissions: ${directPermissionNames}`);
@@ -78,7 +81,7 @@ export class UserService {
   async getUsers() {
     const users = await this.userRepo.find({
       where: { isDeleted: false },
-      relations: ["role"],
+      relations: ["role", "role.permissions"],
     });
     logger.info(`Fetched ${users.length} users`);
     return users;
@@ -87,7 +90,7 @@ export class UserService {
   async updateUser(userId: string, updates: UserUpdateParams) {
     const user = await this.userRepo.findOne({
       where: { id: userId, isDeleted: false },
-      relations: ["role"],
+      relations: ["role", "role.permissions"],
     });
     if (!user) {
       logger.warn(`User update failed, not found: ${userId}`);
@@ -111,7 +114,10 @@ export class UserService {
       user.phoneNumber = updates.phoneNumber;
 
     if (updates.roleName) {
-      const role = await this.roleRepo.findOneBy({ name: updates.roleName });
+      const role = await this.roleRepo.findOne({
+        where: { name: updates.roleName },
+        relations: ["permissions"],
+      });
       if (!role) {
         logger.warn(`Invalid role name: ${updates.roleName}`);
         throw new BadRequestError("Invalid role name");
@@ -119,12 +125,9 @@ export class UserService {
       user.role = role;
     }
 
-    if (
-      updates.directPermissionNames &&
-      updates.directPermissionNames.length > 0
-    ) {
+    if (updates.directPermissionNames) {
       const directPermissions = await this.permRepo.find({
-        where: { name: In(updates.directPermissionNames) }, 
+        where: { name: In(updates.directPermissionNames) },
       });
       if (directPermissions.length !== updates.directPermissionNames.length) {
         logger.warn(`Invalid permissions: ${updates.directPermissionNames}`);

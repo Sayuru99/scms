@@ -7,6 +7,8 @@ import { AppDataSource } from "./config/database";
 import authRoutes from "./routes/auth.routes";
 import { errorHandler } from "./middleware/error.middleware";
 import userRoutes from "./routes/user.routes";
+import permissionRoutes from "./routes/permissions.routes";
+import roleRoutes from "./routes/roles.routes";
 import rateLimit from "express-rate-limit";
 
 config();
@@ -42,6 +44,8 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/permissions", permissionRoutes);
+app.use("/api/roles", roleRoutes);
 
 app.use(errorHandler);
 
