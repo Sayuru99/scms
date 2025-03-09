@@ -41,7 +41,7 @@ export default function Login() {
       const decodedToken = jwtDecode<JwtPayload>(accessToken);
       console.log("User permissions:", decodedToken.permissions);
 
-      const dashboardPath = decodedToken.role === "Admin" ? "/dashboard" : "/student_dashboard";
+      const dashboardPath = decodedToken.role === "Admin" ? "/" : "/";
       navigate(dashboardPath);
     } catch (err) {
       console.error("Login failed:", err);
