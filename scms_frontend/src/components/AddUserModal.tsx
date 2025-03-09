@@ -23,6 +23,18 @@ function AddUserModal({ onUserAdded }: AddUserModalProps) {
     roleName: "Student",
   });
 
+  
+  const generatePassword = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    let newPassword = "";
+    for (let i = 0; i < 12; i++) {
+      newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setNewUser({ ...newUser, password: newPassword });
+    navigator.clipboard.writeText(newPassword);
+    toast.info("Generated password copied to clipboard!");
+  };
+
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = Cookies.get("accessToken");
@@ -52,8 +64,16 @@ function AddUserModal({ onUserAdded }: AddUserModalProps) {
     }
   };
 
+  
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen) {
+      setNewUser({ email: "", password: "", firstName: "", lastName: "", phoneNumber: "", roleName: "Student" });
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>Add User</Button>
       </DialogTrigger>
@@ -69,17 +89,24 @@ function AddUserModal({ onUserAdded }: AddUserModalProps) {
               value={newUser.email}
               onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
               required
+              autoComplete="off"
             />
           </div>
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={newUser.password}
-              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-              required
-            />
+            <div className="flex space-x-2">
+              <Input
+                id="password"
+                type="text"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                required
+                autoComplete="off"
+              />
+              <Button type="button" onClick={generatePassword} variant="outline">
+                Generate
+              </Button>
+            </div>
           </div>
           <div>
             <Label htmlFor="firstName">First Name</Label>
@@ -88,6 +115,7 @@ function AddUserModal({ onUserAdded }: AddUserModalProps) {
               value={newUser.firstName}
               onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
               required
+              autoComplete="off"
             />
           </div>
           <div>
@@ -97,6 +125,7 @@ function AddUserModal({ onUserAdded }: AddUserModalProps) {
               value={newUser.lastName}
               onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
               required
+              autoComplete="off"
             />
           </div>
           <div>
@@ -105,6 +134,7 @@ function AddUserModal({ onUserAdded }: AddUserModalProps) {
               id="phoneNumber"
               value={newUser.phoneNumber}
               onChange={(e) => setNewUser({ ...newUser, phoneNumber: e.target.value })}
+              autoComplete="off"
             />
           </div>
           <div>

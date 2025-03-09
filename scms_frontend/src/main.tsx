@@ -6,15 +6,20 @@ import Login from "./pages/auth/Login.tsx";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import RootLayout from "./layouts/root.layout.tsx";
 import MainLayout from "./layouts/main.layout.tsx";
-import StudentDashboard from "./pages/student/StudentDashboard.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
-import Users from "./pages/users/Users.tsx"; 
+import Users from "./pages/users/Users.tsx";
 
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-red-600">Something went wrong!</h1>
+        <p className="mt-2">An unexpected error occurred. Please try refreshing the page or contact support.</p>
+      </div>
+    ),
     children: [
       {
         element: <ProtectedRoute />,
@@ -28,19 +33,15 @@ const router = createBrowserRouter([
               },
               {
                 path: "/users",
-                element: <Users />, 
+                element: <Users />,
               },
               {
                 path: "/events",
-                element: <div>Events (TBD)</div>, 
+                element: <div>Events (TBD)</div>,
               },
               {
                 path: "/calendar",
-                element: <div>Calendar (TBD)</div>, 
-              },
-              {
-                path: "/student_dashboard",
-                element: <StudentDashboard />,
+                element: <div>Calendar (TBD)</div>,
               },
             ],
           },

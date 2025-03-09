@@ -19,7 +19,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false); 
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   const graduationCapImg =
@@ -31,8 +31,7 @@ export default function Login() {
 
     try {
       const { accessToken, refreshToken } = await authService.login(email, password);
-      
-      
+
       const accessTokenExpires = rememberMe ? 7 : 1 / 96; 
       const refreshTokenExpires = rememberMe ? 30 : 7; 
       Cookies.set("accessToken", accessToken, { expires: accessTokenExpires });
@@ -41,8 +40,8 @@ export default function Login() {
       const decodedToken = jwtDecode<JwtPayload>(accessToken);
       console.log("User permissions:", decodedToken.permissions);
 
-      const dashboardPath = decodedToken.role === "Admin" ? "/" : "/";
-      navigate(dashboardPath);
+      
+      navigate("/");
     } catch (err) {
       console.error("Login failed:", err);
     } finally {

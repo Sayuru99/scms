@@ -57,11 +57,11 @@ function UserList({ users, loading, roleFilter, setRoleFilter, setUsers, setFilt
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-white p-4 md:p-6 rounded-lg shadow-md w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <h2 className="text-xl font-semibold">User List</h2>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter by Role" />
           </SelectTrigger>
           <SelectContent>
@@ -77,25 +77,25 @@ function UserList({ users, loading, roleFilter, setRoleFilter, setUsers, setFilt
       {loading ? (
         <div className="text-center py-4">Loading users...</div>
       ) : (
-        <>
-          <Table>
+        <div className="overflow-x-auto w-full">
+          <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead>First Name</TableHead>
-                <TableHead>Last Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="w-1/4">Email</TableHead>
+                <TableHead className="w-1/5">First Name</TableHead>
+                <TableHead className="w-1/5">Last Name</TableHead>
+                <TableHead className="w-1/5">Role</TableHead>
+                <TableHead className="w-1/10 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentUsers.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>{user.email}</TableCell>
+                  <TableCell className="font-medium truncate max-w-xs">{user.email}</TableCell>
                   <TableCell>{user.firstName}</TableCell>
                   <TableCell>{user.lastName}</TableCell>
                   <TableCell>{user.role.name}</TableCell>
-                  <TableCell className="space-x-2">
+                  <TableCell className="flex justify-end space-x-1">
                     <Button variant="ghost" size="sm" onClick={() => setEditUser(user)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -125,16 +125,28 @@ function UserList({ users, loading, roleFilter, setRoleFilter, setUsers, setFilt
               ))}
             </TableBody>
           </Table>
-          <div className="flex justify-between mt-4">
-            <Button onClick={handlePrev} disabled={currentPage === 1}>
+          <div className="flex justify-between items-center mt-4 px-2">
+            <Button 
+              onClick={handlePrev} 
+              disabled={currentPage === 1}
+              variant="outline"
+              size="sm"
+              className="h-9"
+            >
               Previous
             </Button>
-            <span>Page {currentPage} of {totalPages}</span>
-            <Button onClick={handleNext} disabled={currentPage === totalPages}>
+            <span className="text-sm">Page {currentPage} of {totalPages}</span>
+            <Button 
+              onClick={handleNext} 
+              disabled={currentPage === totalPages || totalPages === 0}
+              variant="outline"
+              size="sm"
+              className="h-9"
+            >
               Next
             </Button>
           </div>
-        </>
+        </div>
       )}
       {editUser && (
         <EditUserModal

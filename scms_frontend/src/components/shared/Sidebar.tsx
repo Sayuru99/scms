@@ -13,7 +13,6 @@ interface JwtPayload {
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [permissions, setPermissions] = useState<string[]>([]);
 
   useEffect(() => {
@@ -21,7 +20,6 @@ const Sidebar = () => {
     if (accessToken) {
       try {
         const decoded: JwtPayload = jwtDecode(accessToken);
-        setUserRole(decoded.role);
         setPermissions(decoded.permissions || []);
       } catch (err) {
         console.error("Failed to decode token:", err);
@@ -30,16 +28,15 @@ const Sidebar = () => {
   }, []);
 
   const menuItems = [
-    { name: "Dashboard", path: "/", icon: <FaTachometerAlt className="w-5 h-5" />, requiredPermission: null },
+    { name: "Dashboard", path: "/", icon: <FaTachometerAlt className="w-5 h-5" />, requiredPermission: null }, // Always visible
     { name: "Users", path: "/users", icon: <FaUsers className="w-5 h-5" />, requiredPermission: "crud:users" },
     { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "view:events" },
     { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "view:calendar" },
   ];
 
-  const filteredMenuItems = menuItems.filter((item) => {
-    if (!item.requiredPermission) return true;
-    return userRole === "Admin" || permissions.includes(item.requiredPermission);
-  });
+  const filteredMenuItems = menuItems.filter((item) => 
+    item.requiredPermission === null || permissions.includes(item.requiredPermission)
+  );
 
   return (
     <div
