@@ -207,6 +207,149 @@ export const permissionService = {
     ),
 };
 
+export const resourceService = {
+  getResources: (
+    token: string,
+    page: number = 1,
+    limit: number = 10,
+    status?: string,
+    typeId?: number
+  ) =>
+    apiRequest<{
+      resources: Resource[];
+      total: number;
+      page: number;
+      limit: number;
+    }>(
+      `/api/resources?page=${page}&limit=${limit}${
+        status ? `&status=${status}` : ""
+      }${typeId ? `&typeId=${typeId}` : ""}`,
+      "GET",
+      undefined,
+      token
+    ),
+
+  createResource: (
+    data: {
+      name: string;
+      description?: string;
+      typeId: number;
+      status?: string;
+    },
+    token: string
+  ) =>
+    apiRequest<{ message: string; resource: Resource }>(
+      "/api/resources",
+      "POST",
+      data,
+      token,
+      true
+    ),
+
+  updateResource: (
+    resourceId: number,
+    updates: {
+      name?: string;
+      description?: string;
+      typeId?: number;
+      status?: string;
+    },
+    token: string
+  ) =>
+    apiRequest<{ message: string; resource: Resource }>(
+      `/api/resources/${resourceId}`,
+      "PUT",
+      updates,
+      token,
+      true
+    ),
+
+  deleteResource: (resourceId: number, token: string) =>
+    apiRequest<{ message: string; resourceId: number }>(
+      `/api/resources/${resourceId}`,
+      "DELETE",
+      undefined,
+      token,
+      true
+    ),
+
+  getResourceTypes: (token: string) =>
+    apiRequest<ResourceType[]>("/api/resources/types", "GET", undefined, token),
+
+  createResourceType: (type: string, token: string) =>
+    apiRequest<{ message: string; resourceType: ResourceType }>(
+      "/api/resources/types",
+      "POST",
+      { type },
+      token,
+      true
+    ),
+
+  updateResourceType: (typeId: number, type: string, token: string) =>
+    apiRequest<{ message: string; resourceType: ResourceType }>(
+      `/api/resources/types/${typeId}`,
+      "PUT",
+      { type },
+      token,
+      true
+    ),
+
+  deleteResourceType: (typeId: number, token: string) =>
+    apiRequest<{ message: string; typeId: number }>(
+      `/api/resources/types/${typeId}`,
+      "DELETE",
+      undefined,
+      token,
+      true
+    ),
+
+  getReservations: (
+    token: string,
+    page: number = 1,
+    limit: number = 5,
+    status?: string
+  ) =>
+    apiRequest<{
+      reservations: Reservation[];
+      total: number;
+      page: number;
+      limit: number;
+    }>(
+      `/api/resources/reservations?page=${page}&limit=${limit}${
+        status ? `&status=${status}` : ""
+      }`,
+      "GET",
+      undefined,
+      token
+    ),
+
+  createReservation: (
+    data: {
+      resourceId: number;
+      startTime: string;
+      endTime: string;
+      purpose?: string;
+    },
+    token: string
+  ) =>
+    apiRequest<{ message: string; reservation: Reservation }>(
+      "/api/resources/reservations",
+      "POST",
+      data,
+      token,
+      true
+    ),
+
+  updateReservation: (reservationId: number, status: string, token: string) =>
+    apiRequest<{ message: string; reservation: Reservation }>(
+      `/api/resources/reservations/${reservationId}`,
+      "PUT",
+      { status },
+      token,
+      true
+    ),
+};
+
 export interface User {
   id: string;
   email: string;
@@ -256,6 +399,35 @@ export interface Permission {
   scope?: string;
   description: string;
   isActive: boolean;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Resource {
+  id: number;
+  name: string;
+  description?: string;
+  type: ResourceType;
+  status: "Available" | "Reserved" | "Maintenance";
+  isDeleted: boolean;
+}
+
+export interface ResourceType {
+  id: number;
+  type: string;
+  isDeleted: boolean;
+}
+
+export interface Reservation {
+  id: number;
+  user: User;
+  resource: Resource;
+  startTime: string;
+  endTime: string;
+  status: "Pending" | "Approved" | "Rejected" | "Cancelled";
+  purpose?: string;
+  approvedBy?: User;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
