@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn, FaLock } from "react-icons/fa";
+import { BookOpen } from "lucide-react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
@@ -33,6 +34,7 @@ const Sidebar = () => {
     { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
     { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" }, 
     { name: "Permissions", path: "/permissions", icon: <FaLock className="w-5 h-5" />, requiredPermission: "read:roles" },
+    { name: "Resources", path: "/resources", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:resources" },
   ];
 
   const filteredMenuItems = menuItems.filter((item) =>

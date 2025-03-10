@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import Users from "./pages/users/Users.tsx";
 import Permissions from "./pages/permissions/Permissions.tsx";
+import Resources from "./pages/resources/Resources.tsx";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
               {
                 path: "/calendar",
                 element: <div>Calendar (TBD)</div>,
+              },
+              {
+                path: "/resources",
+                element: <Resources />, 
               },
             ],
           },
