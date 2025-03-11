@@ -39,6 +39,7 @@ function Resources() {
     if (accessToken) {
       try {
         const decoded: JwtPayload = jwtDecode(accessToken);
+        console.log(decoded.permissions);
         setPermissions(decoded.permissions || []);
         fetchResources(accessToken, page, filterType);
         fetchResourceTypes(accessToken);
