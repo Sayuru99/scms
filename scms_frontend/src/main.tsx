@@ -1,3 +1,4 @@
+
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -12,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import Users from "./pages/users/Users.tsx";
 import Permissions from "./pages/permissions/Permissions.tsx";
 import Resources from "./pages/resources/Resources.tsx";
+import Courses from "./pages/courses/Cuourse.tsx"; 
 
 const router = createBrowserRouter([
   {
@@ -51,7 +53,11 @@ const router = createBrowserRouter([
               },
               {
                 path: "/resources",
-                element: <Resources />, 
+                element: <Resources />,
+              },
+              {
+                path: "/courses", 
+                element: <Courses />,
               },
             ],
           },
