@@ -12,6 +12,7 @@ import userRoutes from "./routes/user.routes";
 import permissionRoutes from "./routes/permissions.routes";
 import roleRoutes from "./routes/roles.routes";
 import resourceRoutes from "./routes/resource.routes";
+import courseRoutes from "./routes/courses.routes";
 
 config();
 
@@ -49,6 +50,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/permissions", permissionRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/resources", resourceRoutes);
+app.use("/api/courses", courseRoutes);
 
 app.use(errorHandler);
 
