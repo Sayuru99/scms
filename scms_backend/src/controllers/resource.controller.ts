@@ -30,7 +30,10 @@ export class ResourceController {
 
   async updateResource(req: Request, res: Response, next: NextFunction) {
     try {
-      const resource = await this.resourceService.updateResource(parseInt(req.params.resourceId), req.body);
+      const resource = await this.resourceService.updateResource(
+        parseInt(req.params.resourceId),
+        req.body
+      );
       res.json({ message: "Resource updated", resource });
     } catch (error) {
       next(error);
@@ -39,7 +42,9 @@ export class ResourceController {
 
   async deleteResource(req: Request, res: Response, next: NextFunction) {
     try {
-      const resourceId = await this.resourceService.deleteResource(parseInt(req.params.resourceId));
+      const resourceId = await this.resourceService.deleteResource(
+        parseInt(req.params.resourceId)
+      );
       res.json({ message: "Resource deleted", resourceId });
     } catch (error) {
       next(error);
@@ -48,7 +53,9 @@ export class ResourceController {
 
   async createResourceType(req: Request, res: Response, next: NextFunction) {
     try {
-      const resourceType = await this.resourceService.createResourceType(req.body.type);
+      const resourceType = await this.resourceService.createResourceType(
+        req.body.type
+      );
       res.status(201).json({ message: "Resource type created", resourceType });
     } catch (error) {
       next(error);
@@ -66,7 +73,10 @@ export class ResourceController {
 
   async updateResourceType(req: Request, res: Response, next: NextFunction) {
     try {
-      const resourceType = await this.resourceService.updateResourceType(parseInt(req.params.typeId), req.body.type);
+      const resourceType = await this.resourceService.updateResourceType(
+        parseInt(req.params.typeId),
+        req.body.type
+      );
       res.json({ message: "Resource type updated", resourceType });
     } catch (error) {
       next(error);
@@ -75,7 +85,9 @@ export class ResourceController {
 
   async deleteResourceType(req: Request, res: Response, next: NextFunction) {
     try {
-      const typeId = await this.resourceService.deleteResourceType(parseInt(req.params.typeId));
+      const typeId = await this.resourceService.deleteResourceType(
+        parseInt(req.params.typeId)
+      );
       res.json({ message: "Resource type deleted", typeId });
     } catch (error) {
       next(error);
