@@ -348,6 +348,28 @@ export const resourceService = {
       token,
       true
     ),
+
+  requestResource: (
+    resourceId: number,
+    data: { startTime: string; endTime: string; purpose?: string },
+    token: string
+  ) =>
+    apiRequest<{ message: string; reservation: any }>(
+      `/api/resources/${resourceId}/request`,
+      "POST",
+      data,
+      token,
+      true
+    ),
+
+  returnResource: (resourceId: number, token: string) =>
+    apiRequest<{ message: string }>(
+      `/api/resources/${resourceId}/return`,
+      "POST",
+      undefined,
+      token,
+      true
+    ),
 };
 
 export interface User {

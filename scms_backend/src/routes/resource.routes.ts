@@ -63,4 +63,16 @@ router.put(
   resourceController.updateReservation.bind(resourceController)
 );
 
+router.post(
+  "/:resourceId/request",
+  authMiddleware("create:reservations"),
+  resourceController.requestResource.bind(resourceController)
+);
+
+router.post(
+  "/:resourceId/return",
+  authMiddleware("update:reservations"),
+  resourceController.returnResource.bind(resourceController)
+);
+
 export default router;

@@ -112,7 +112,7 @@ export class ResourceController {
       const reservations = await this.resourceService.getReservations({
         page: page ? parseInt(page as string) : undefined,
         limit: limit ? parseInt(limit as string) : undefined,
-        status: status as "Pending" | "Approved" | "Rejected" | "Cancelled",
+        status: status as "Requested" | "Approved" | "Rejected" | "Returned" | undefined,
       });
       res.json(reservations);
     } catch (error) {
@@ -120,14 +120,45 @@ export class ResourceController {
     }
   }
 
+  async requestResource(req: Request, res: Response, next: NextFunction) {
+    try {
+      const resourceId = parseInt(req.params.resourceId);
+      const userId = req.user!.userId;
+      const { startTime, endTime, purpose } = req.body;
+
+      const reservation = await this.resourceService.requestResource(resourceId, {
+        userId,
+        startTime,
+        endTime,
+        purpose,
+      });
+
+      res.status(201).json({ message: "Resource requested successfully", reservation });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async returnResource(req: Request, res: Response, next: NextFunction) {
+    try {
+      const resourceId = parseInt(req.params.resourceId);
+      const userId = req.user!.userId;
+
+      await this.resourceService.returnResource(resourceId, userId);
+      res.json({ message: "Resource returned successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateReservation(req: Request, res: Response, next: NextFunction) {
     try {
-      const reservation = await this.resourceService.updateReservation(
-        parseInt(req.params.reservationId),
-        req.body.status,
-        req.user!.userId
-      );
-      res.json({ message: "Reservation updated", reservation });
+      const reservationId = parseInt(req.params.reservationId);
+      const { status } = req.body;
+      const approvedById = req.user!.userId;
+
+      const reservation = await this.resourceService.updateReservation(reservationId, { status }, approvedById);
+      res.json({ message: `Reservation ${status.toLowerCase()} successfully`, reservation });
     } catch (error) {
       next(error);
     }
