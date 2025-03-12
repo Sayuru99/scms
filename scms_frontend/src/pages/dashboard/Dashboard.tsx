@@ -139,7 +139,9 @@ function Dashboard() {
       <p className="text-gray-600">Welcome to your SCMS Dashboard.</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        
+        {permissions.includes("read:users") && (
+          <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-2">Overview</h2>
           <p className="text-gray-600">Quick stats about your activity.</p>
           <div className="mt-4">
@@ -147,7 +149,8 @@ function Dashboard() {
             <p className="text-sm text-gray-500">Pending Tasks</p>
           </div>
         </div>
-
+        )}
+        
         {permissions.includes("read:users") && (
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-2">Current Users</h2>
