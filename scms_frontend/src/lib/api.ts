@@ -372,6 +372,69 @@ export const resourceService = {
     ),
 };
 
+export const courseService = {
+  getEnrolledCourses: (token: string, page: number = 1, limit: number = 10) =>
+    apiRequest<{ courses: any[]; total: number; page: number; limit: number }>(
+      `/api/courses/enrolled?page=${page}&limit=${limit}`,
+      "GET",
+      undefined,
+      token,
+      true
+    ),
+
+  getAvailableCourses: (token: string, page: number = 1, limit: number = 3) =>
+    apiRequest<{ courses: any[]; total: number; page: number; limit: number }>(
+      `/api/courses/available?page=${page}&limit=${limit}`,
+      "GET",
+      undefined,
+      token,
+      true
+    ),
+
+  enrollStudent: (courseId: number, token: string) =>
+    apiRequest<{ message: string; enrollment: any }>(
+      `/api/courses/${courseId}/enroll`,
+      "POST",
+      undefined,
+      token,
+      true
+    ),
+
+  createCourse: (
+    data: { code: string; name: string; description?: string; credits: number },
+    token: string
+  ) =>
+    apiRequest<{ message: string; course: any }>(
+      `/api/courses`,
+      "POST",
+      data,
+      token,
+      true
+    ),
+
+  updateCourse: (
+    courseId: number,
+    data: { code: string; name: string; description?: string; credits: number },
+    token: string
+  ) =>
+    apiRequest<{ message: string; course: any }>(
+      `/api/courses/${courseId}`,
+      "PUT",
+      data,
+      token,
+      true
+    ),
+
+  deleteCourse: (courseId: number, token: string) =>
+    apiRequest<{ message: string; courseId: number }>(
+      `/api/courses/${courseId}`,
+      "DELETE",
+      undefined,
+      token,
+      true
+    ),
+};
+
 export interface User {
   id: string;
   email: string;

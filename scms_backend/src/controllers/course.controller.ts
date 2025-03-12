@@ -45,8 +45,54 @@ export class CourseController {
 
   async deleteCourse(req: Request, res: Response, next: NextFunction) {
     try {
-      const courseId = await this.courseService.deleteCourse(parseInt(req.params.courseId));
+      const courseId = await this.courseService.deleteCourse(
+        parseInt(req.params.courseId)
+      );
       res.json({ message: "Course deleted", courseId });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getEnrolledCourses(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { page, limit } = req.query;
+      const studentId = req.user!.userId;
+      const courses = await this.courseService.getEnrolledCourses(
+        studentId,
+        page ? parseInt(page as string) : undefined,
+        limit ? parseInt(limit as string) : undefined
+      );
+      res.json(courses);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getAvailableCourses(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { page, limit } = req.query;
+      const studentId = req.user!.userId;
+      const courses = await this.courseService.getAvailableCourses(
+        studentId,
+        page ? parseInt(page as string) : undefined,
+        limit ? parseInt(limit as string) : undefined
+      );
+      res.json(courses);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async enrollStudent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const studentId = req.user!.userId;
+      const courseId = parseInt(req.params.courseId);
+      const enrollment = await this.courseService.enrollStudent(
+        studentId,
+        courseId
+      );
+      res.status(201).json({ message: "Enrolled successfully", enrollment });
     } catch (error) {
       next(error);
     }

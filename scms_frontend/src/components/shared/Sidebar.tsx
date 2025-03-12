@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn, FaLock } from "react-icons/fa";
@@ -32,9 +33,10 @@ const Sidebar = () => {
     { name: "Dashboard", path: "/", icon: <FaTachometerAlt className="w-5 h-5" />, requiredPermission: null },
     { name: "Users", path: "/users", icon: <FaUsers className="w-5 h-5" />, requiredPermission: "read:users" },
     { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
-    { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" }, 
+    { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" },
     { name: "Permissions", path: "/permissions", icon: <FaLock className="w-5 h-5" />, requiredPermission: "read:roles" },
     { name: "Resources", path: "/resources", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:resources" },
+    { name: "Courses", path: "/courses", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:courses" }, 
   ];
 
   const filteredMenuItems = menuItems.filter((item) =>
@@ -48,10 +50,7 @@ const Sidebar = () => {
       } bg-gray-800 text-white h-screen p-5 transition-all duration-300 flex flex-col`}
     >
       <div className="flex justify-end mb-6">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-white focus:outline-none"
-        >
+        <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none">
           {isOpen ? (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

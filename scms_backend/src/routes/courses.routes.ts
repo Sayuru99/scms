@@ -26,4 +26,20 @@ router.delete(
   courseController.deleteCourse.bind(courseController)
 );
 
+router.get(
+  "/enrolled",
+  authMiddleware("read:courses"),
+  courseController.getEnrolledCourses.bind(courseController)
+);
+router.get(
+  "/available",
+  authMiddleware("read:courses"),
+  courseController.getAvailableCourses.bind(courseController)
+);
+router.post(
+  "/:courseId/enroll",
+  authMiddleware("create:enrollments"),
+  courseController.enrollStudent.bind(courseController)
+);
+
 export default router;
