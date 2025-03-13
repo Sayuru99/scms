@@ -65,7 +65,7 @@ const Sidebar = () => {
 
       {isOpen && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold">SCMS</h2>
+          <h2 className="text-2xl font-bold">ESOFT SCMS</h2>
         </div>
       )}
 
