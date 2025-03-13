@@ -413,7 +413,7 @@ export const courseService = {
     ),
 
   updateCourse: (
-    courseId: number,
+    courseId: string,
     data: { code: string; name: string; description?: string; credits: number },
     token: string
   ) =>
@@ -425,7 +425,7 @@ export const courseService = {
       true
     ),
 
-  deleteCourse: (courseId: number, token: string) =>
+  deleteCourse: (courseId: string, token: string) =>
     apiRequest<{ message: string; courseId: number }>(
       `/api/courses/${courseId}`,
       "DELETE",
@@ -446,6 +446,15 @@ export interface User {
   isActive: boolean;
   isFirstLogin: boolean;
   isDeleted: boolean;
+}
+
+export interface Course {
+  id: string;
+  code: string;
+  name: string;
+  credits: number;
+  description: string;
+  // isDeleted: boolean;
 }
 
 export interface CreateUserData {
