@@ -2,10 +2,12 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import { courseService } from "../../lib/api";
+import { resourceService } from "../../lib/api";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import ReservationStatisticsCard from "./components/ReservationStatisticsCard";
+import ReservationsTable from "./components/ReservationsTable";
+import ResourceGrid from "./components/ResourceGrid";
 
 interface JwtPayload {
   userId: string;
@@ -37,7 +39,7 @@ function Reservation() {
 
   const fetchEnrolledCourses = async (token: string) => {
     try {
-      const data = await courseService.getEnrolledCourses(token);
+      const data = await resourceService.getReservations(token);
       setEnrolledCourses(data.courses);
     } catch (err) {
       console.error("Failed to fetch enrolled courses:", err);
@@ -57,7 +59,7 @@ function Reservation() {
 
       <motion.div
         layout
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-2"
       >
         <ReservationStatisticsCard title="Active Reservations" value={enrolledCourses.length.toString()} />
         <ReservationStatisticsCard title="Next Resource Return In" value={"2h 38m"} />
@@ -65,8 +67,10 @@ function Reservation() {
         
       </motion.div>
      
-      <div className="container mx-auto p-4">
-    </div>
+      <div className="min-h-screen space-y-10 py-8">
+      <ReservationsTable/>
+      <ResourceGrid />
+      </div>
     </div>
   );
 }
