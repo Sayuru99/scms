@@ -14,6 +14,7 @@ import Users from "./pages/users/Users.tsx";
 import Permissions from "./pages/permissions/Permissions.tsx";
 import Resources from "./pages/resources/Resources.tsx";
 import Courses from "./pages/courses/Course.tsx"; 
+import Reservation from "./pages/reservation/Reservation.tsx";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
               {
                 path: "/resources",
                 element: <Resources />,
+              },
+              {
+                path: "/reservation",
+                element: <Reservation />,
               },
               {
                 path: "/courses", 
