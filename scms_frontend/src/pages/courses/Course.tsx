@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { courseService } from "../../lib/api";
 import { toast } from "react-toastify";
 import EnrolledCoursesTable from "./components/EnrolledCoursesTable";
-import AvailableCoursesCard from "./components/AvailableCoursesCard";
+import AvailableCoursesTable from "./components/AvailableCoursesTable";
 import UpcomingExamsTable from "./components/UpcomingExamsTable";
 import CreateCourseDialog from "./components/CreateCourseDialog";
 import EditCourseDialog from "./components/EditCourseDialog";
@@ -119,18 +119,18 @@ function Courses() {
             />
           )}
 
-          <EnrolledCoursesTable
+          {/* <EnrolledCoursesTable
             courses={enrolledCourses}
             permissions={permissions}
             onEditCourse={setEditCourse}
             onDeleteCourse={handleDeleteCourse}
-          />
-          <AvailableCoursesCard
+          /> */}
+          <AvailableCoursesTable
             courses={availableCourses}
             permissions={permissions}
             onEnroll={handleEnroll}
           />
-          <UpcomingExamsTable exams={upcomingExams} />
+          {/* <UpcomingExamsTable exams={upcomingExams} /> */}
 
           {editCourse && (
             <EditCourseDialog

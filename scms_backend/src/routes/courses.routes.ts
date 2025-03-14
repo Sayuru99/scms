@@ -28,7 +28,7 @@ router.delete(
 
 router.get(
   "/enrolled",
-  authMiddleware("read:courses"),
+  authMiddleware("read:enrolled_courses"),
   courseController.getEnrolledCourses.bind(courseController)
 );
 router.get(

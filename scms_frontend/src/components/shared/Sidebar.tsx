@@ -32,11 +32,11 @@ const Sidebar = () => {
   const menuItems = [
     { name: "Dashboard", path: "/", icon: <FaTachometerAlt className="w-5 h-5" />, requiredPermission: null },
     { name: "Users", path: "/users", icon: <FaUsers className="w-5 h-5" />, requiredPermission: "read:users" },
-    { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
-    { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" },
     { name: "Permissions", path: "/permissions", icon: <FaLock className="w-5 h-5" />, requiredPermission: "read:roles" },
-    { name: "Resources", path: "/resources", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:resources" },
     { name: "Courses", path: "/courses", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:courses" }, 
+    { name: "Resources", path: "/resources", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:resources" },
+    { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" },
+    { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
   ];
 
   const filteredMenuItems = menuItems.filter((item) =>
@@ -65,7 +65,7 @@ const Sidebar = () => {
 
       {isOpen && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold">SCMS</h2>
+          <h2 className="text-2xl font-bold">ESOFT SCMS</h2>
         </div>
       )}
 

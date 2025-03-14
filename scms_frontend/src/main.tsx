@@ -13,7 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import Users from "./pages/users/Users.tsx";
 import Permissions from "./pages/permissions/Permissions.tsx";
 import Resources from "./pages/resources/Resources.tsx";
-import Courses from "./pages/courses/Cuourse.tsx"; 
+import Courses from "./pages/courses/Course.tsx"; 
 
 const router = createBrowserRouter([
   {
