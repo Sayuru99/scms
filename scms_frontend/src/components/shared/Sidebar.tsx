@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn, FaLock } from "react-icons/fa";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Briefcase } from "lucide-react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
@@ -34,7 +34,7 @@ const Sidebar = () => {
     { name: "Users", path: "/users", icon: <FaUsers className="w-5 h-5" />, requiredPermission: "read:users" },
     { name: "Permissions", path: "/permissions", icon: <FaLock className="w-5 h-5" />, requiredPermission: "read:roles" },
     { name: "Courses", path: "/courses", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:courses" }, 
-    { name: "Resources", path: "/resources", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:resources" },
+    { name: "Resources", path: "/resources", icon: <Briefcase className="w-5 h-5" />, requiredPermission: "read:resources" },
     { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" },
     { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
   ];
