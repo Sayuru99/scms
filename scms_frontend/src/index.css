@@ -140,6 +140,75 @@
   .module-content {
     @apply animate-fade-in;
   }
+  .resource-card {
+    @apply bg-card shadow-sm border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-md hover:scale-[1.01] hover:-translate-y-1;
+  }
+
+  .resource-tag {
+    @apply text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 mb-2 inline-block;
+  }
+
+  .resource-title {
+    @apply text-xl font-semibold mb-2;
+  }
+
+  .resource-description {
+    @apply text-sm text-muted-foreground mb-4;
+  }
+.reserve-btn {
+    @apply w-full inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2;
+  }
+  .filter-btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background px-4 py-2;
+  }
+
+  .filter-btn-active {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .filter-btn-inactive {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+
+  .search-input {
+    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .reservation-table {
+    @apply w-full border-collapse;
+  }
+
+  .reservation-th {
+    @apply text-left p-4 text-sm font-medium text-muted-foreground bg-secondary;
+  }
+
+  .reservation-td {
+    @apply p-4 text-sm border-b border-border;
+  }
+
+  .status-active {
+    @apply inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800;
+  }
+
+  .status-upcoming {
+    @apply inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800;
+  }
+
+  .action-btn-cancel {
+    @apply inline-flex items-center text-destructive hover:text-destructive/80 transition-colors;
+  }
+
+  .action-btn-extend {
+    @apply inline-flex items-center text-primary hover:text-primary/80 transition-colors ml-4;
+  }
+
+  .view-toggle {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 p-1;
+  }
+
+  .view-toggle-active {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
 }
 
 #root {

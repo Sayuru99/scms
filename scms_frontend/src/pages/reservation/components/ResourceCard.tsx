@@ -1,0 +1,40 @@
+import React from 'react';
+import { Button } from '@/components/ui/button';
+
+interface ResourceCardProps {
+  type: 'Lecture Hall' | 'Equipment' | 'Labs';
+  title: string;
+  description: string;
+  onReserve: () => void;
+}
+
+const ResourceCard: React.FC<ResourceCardProps> = ({ type, title, description, onReserve }) => {
+  const getTagColor = () => {
+    switch (type) {
+      case 'Lecture Hall':
+        return 'bg-blue-100 text-blue-800';
+      case 'Equipment':
+        return 'bg-amber-100 text-amber-800';
+      case 'Labs':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <div className="resource-card animate-scale-in">
+      <div className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getTagColor()} mb-2 inline-block`}> {type} </div>
+      <h3 className="resource-title">{title}</h3>
+      <p className="resource-description">{description}</p>
+      <Button 
+        onClick={onReserve} 
+        className="reserve-btn"
+      >
+        Reserve Now
+      </Button>
+    </div>
+  );
+};
+
+export default ResourceCard;
