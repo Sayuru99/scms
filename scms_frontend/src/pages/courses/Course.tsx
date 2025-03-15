@@ -4,11 +4,10 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { courseService } from "../../lib/api";
 import { toast } from "react-toastify";
-import EnrolledCoursesTable from "./components/EnrolledCoursesTable";
 import AvailableCoursesTable from "./components/AvailableCoursesTable";
-import UpcomingExamsTable from "./components/UpcomingExamsTable";
 import CreateCourseDialog from "./components/CreateCourseDialog";
 import EditCourseDialog from "./components/EditCourseDialog";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 interface JwtPayload {
   userId: string;
@@ -19,10 +18,7 @@ interface JwtPayload {
 
 function Courses() {
   const [permissions, setPermissions] = useState<string[]>([]);
-  const [, setRole] = useState<string>("");
-  const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [availableCourses, setAvailableCourses] = useState<any[]>([]);
-  const [upcomingExams, setUpcomingExams] = useState<any[]>([]);
   const [newCourse, setNewCourse] = useState({ code: "", name: "", description: "", credits: "" });
   const [editCourse, setEditCourse] = useState<any | null>(null);
 
@@ -32,11 +28,9 @@ function Courses() {
       try {
         const decoded: JwtPayload = jwtDecode(accessToken);
         setPermissions(decoded.permissions || []);
-        setRole(decoded.role);
         if (decoded.permissions.includes("read:courses")) {
           fetchEnrolledCourses(accessToken);
           fetchAvailableCourses(accessToken);
-          fetchUpcomingExams();
         }
       } catch (err) {
         console.error("Failed to decode token:", err);
@@ -47,7 +41,6 @@ function Courses() {
   const fetchEnrolledCourses = async (token: string) => {
     try {
       const data = await courseService.getEnrolledCourses(token);
-      setEnrolledCourses(data.courses);
     } catch (err) {
       console.error("Failed to fetch enrolled courses:", err);
       toast.error("Failed to load enrolled courses");
@@ -62,14 +55,6 @@ function Courses() {
       console.error("Failed to fetch available courses:", err);
       toast.error("Failed to load available courses");
     }
-  };
-
-  const fetchUpcomingExams = () => {
-    
-    setUpcomingExams([
-      { id: 1, name: "Midterm Exam - CS101", date: "2025-03-20T10:00:00", course: "CS101" },
-      { id: 2, name: "Final Exam - MATH201", date: "2025-04-15T14:00:00", course: "MATH201" },
-    ]);
   };
 
   const handleEnroll = async (courseId: number) => {
@@ -87,26 +72,24 @@ function Courses() {
     }
   };
 
-  const handleDeleteCourse = async (courseId: number) => {
-    const token = Cookies.get("accessToken");
-    if (!token) return;
-
-    try {
-      await courseService.deleteCourse(courseId, token); 
-      fetchEnrolledCourses(token);
-      fetchAvailableCourses(token);
-      toast.success("Course deleted successfully");
-    } catch (err) {
-      console.error("Failed to delete course:", err);
-      toast.error("Failed to delete course");
-    }
-  };
-
   return (
     <>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbLink href="#">
+              Courses
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator className="hidden md:block" />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Add Course</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       {permissions.includes("read:courses") ? (
         <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6">Courses</h1>
+          {/* <h1 className="text-3xl font-bold mb-6">Courses</h1> */}
 
           {permissions.includes("create:courses") && (
             <CreateCourseDialog
@@ -119,18 +102,11 @@ function Courses() {
             />
           )}
 
-          {/* <EnrolledCoursesTable
-            courses={enrolledCourses}
-            permissions={permissions}
-            onEditCourse={setEditCourse}
-            onDeleteCourse={handleDeleteCourse}
-          /> */}
           <AvailableCoursesTable
             courses={availableCourses}
             permissions={permissions}
             onEnroll={handleEnroll}
           />
-          {/* <UpcomingExamsTable exams={upcomingExams} /> */}
 
           {editCourse && (
             <EditCourseDialog

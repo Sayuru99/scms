@@ -1,9 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Course } from "@/lib/api";
-import EditCourseModal from "./EditCourseModal";
-import { toast } from "react-toastify";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pencil } from "lucide-react";
 
@@ -15,9 +14,9 @@ interface AvailableCoursesTableProps {
   setFilteredCourses: React.Dispatch<React.SetStateAction<Course[]>>;
 }
 
-export default function AvailableCoursesTable({ courses, roleFilter, setRoleFilter, setCourses, setFilteredCourses }: AvailableCoursesTableProps) {
+export default function AvailableCoursesTable({ courses, roleFilter, setRoleFilter }: AvailableCoursesTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
-   const [editCourse, setEditCourse] = useState<Course | null>(null);
+  const navigate = useNavigate();
   const coursesPerPage = 5;
 
   const indexOfLastCourse = currentPage * coursesPerPage;
@@ -70,7 +69,7 @@ export default function AvailableCoursesTable({ courses, roleFilter, setRoleFilt
                       variant="default"
                       size="sm"
                       onClick={() => {
-                        toast.info("Not completed yet!");
+                        navigate(`/courses/manage/${course.id}`);
                       }}
                     >
                       <Pencil className="h-4 w-4" /> Manage
@@ -102,16 +101,6 @@ export default function AvailableCoursesTable({ courses, roleFilter, setRoleFilt
           </Button>
         </div>
       </div>
-      {editCourse && (
-        <EditCourseModal
-          course={editCourse}
-          onClose={() => setEditCourse(null)}
-          onCourseUpdated={(updatedCourse) => {
-            setCourses((prev) => prev.map((u) => (u.id === updatedCourse.id ? updatedCourse : u)));
-            setFilteredCourses((prev) => prev.map((u) => (u.id === updatedCourse.id ? updatedCourse : u)));
-          }}
-        />
-      )}
     </div>
   );
 }

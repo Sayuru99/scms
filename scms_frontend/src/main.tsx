@@ -62,8 +62,12 @@ const router = createBrowserRouter([
                 element: <Reservation />,
               },
               {
-                path: "/courses", 
+                path: "/courses",
                 element: <Courses />,
+              },
+              {
+                path: "/courses/manage/:courseId",
+                element: <div>Manage Course (TBD)</div>,
               },
             ],
           },
