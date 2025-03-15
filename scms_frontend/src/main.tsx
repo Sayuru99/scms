@@ -15,6 +15,7 @@ import Permissions from "./pages/permissions/Permissions.tsx";
 import Resources from "./pages/resources/Resources.tsx";
 import Courses from "./pages/courses/Course.tsx"; 
 import Reservation from "./pages/reservation/Reservation.tsx";
+import Calendar from "./pages/Calendar/Calendar.tsx";
 
 const router = createBrowserRouter([
   {
@@ -50,7 +51,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "/calendar",
-                element: <div>Calendar (TBD)</div>,
+                element: <Calendar />,
               },
               {
                 path: "/resources",
