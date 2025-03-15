@@ -1,24 +1,11 @@
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Book, Pencil, Trash2 } from "lucide-react";
 import { Course } from "@/lib/api";
-import { courseService } from "@/lib/api";
 import EditCourseModal from "./EditCourseModal";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Pencil } from "lucide-react";
 
 interface AvailableCoursesTableProps {
   courses: Course[];
@@ -40,21 +27,6 @@ export default function AvailableCoursesTable({ courses, roleFilter, setRoleFilt
 
   const handleNext = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-
-
-  const handleDelete = async (courseId: string) => {
-    const token = Cookies.get("accessToken");
-    if (!token) return;
-    try {
-      await courseService.deleteCourse(courseId, token);
-      setCourses((prev) => prev.filter((u) => u.id !== courseId));
-      setFilteredCourses((prev) => prev.filter((u) => u.id !== courseId));
-      toast.success("User deleted successfully");
-    } catch (err) {
-      console.error("Failed to delete user:", err);
-      toast.error("Failed to delete user");
-    }
-  };
   
   return (
     <div className="bg-white p-4 md:p-6 rounded-lg shadow-md w-full">
@@ -83,8 +55,7 @@ export default function AvailableCoursesTable({ courses, roleFilter, setRoleFilt
               <TableHead className="w-1/10">Course Code</TableHead>
               <TableHead className="w-1/5">Description</TableHead>
               <TableHead className="w-1/10">Credits</TableHead>
-              <TableHead className="w-1/7 text-center"></TableHead>
-              <TableHead className="w-1/10 text-right">Actions</TableHead>
+              <TableHead className="w-1/10">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -102,43 +73,8 @@ export default function AvailableCoursesTable({ courses, roleFilter, setRoleFilt
                         toast.info("Not completed yet!");
                       }}
                     >
-                      <Book className="h-4 w-4" /> Manage Modules
+                      <Pencil className="h-4 w-4" /> Manage
                     </Button>
-                </TableCell>
-                <TableCell className="flex justify-end space-x-1">
-                  {/* {permissions.includes("update:courses") && ( */}
-                    <Button variant="ghost" size="sm" onClick={() => setEditCourse(course)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  {/* )} */}
-                  {/* {permissions.includes("delete:courses") && ( */}
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action will permanently delete the course {course.name}. This cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(course.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  {/* )} */}
-                  {/* {permissions.includes("create:enrollments") && (
-                    <Button variant="secondary" onClick={() => onEnroll(course.id)}>
-                      Enroll Now
-                    </Button>
-                  )} */}
                 </TableCell>
               </TableRow>
             ))}
