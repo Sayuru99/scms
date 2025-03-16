@@ -1,108 +1,159 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { toast } from 'react-toastify';
-
-interface Reservation {
-  id: string;
-  resource: string;
-  type: string;
-  date: string;
-  time: string;
-  status: 'Active' | 'Upcoming';
-}
+import { resourceService, type Reservation } from '../../../lib/api';
+import { Spinner } from '../../../components/ui/Spinner';
+import Cookies from "js-cookie";
 
 const ReservationsTable: React.FC = () => {
-  // Sample data
-  const reservations: Reservation[] = [
-    {
-      id: '1',
-      resource: 'Laptop 32',
-      type: 'Equipment',
-      date: 'Jan 15, 2025',
-      time: '09:00 - 11:00',
-      status: 'Active',
-    },
-    {
-      id: '2',
-      resource: 'Hall A-101',
-      type: 'Lecture Hall',
-      date: 'Jan 15, 2025',
-      time: '09:00 - 11:00',
-      status: 'Active',
-    },
-    {
-      id: '3',
-      resource: 'Computer Lab C2',
-      type: 'Labs',
-      date: 'Jan 16, 2025',
-      time: '09:00 - 11:00',
-      status: 'Active',
-    },
-  ];
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCancel = (reservation: Reservation) => {
-    toast.error(`Cancelled reservation for ${reservation.resource}`, {
-      description: 'Your reservation has been cancelled.',
-    });
+  useEffect(() => {
+    const fetchReservations = async () => {
+      const accessToken = Cookies.get("accessToken");
+      if (!accessToken) return;
+
+      try {
+        const response = await resourceService.getReservationsByID(accessToken);
+        // console.log('Reservations response:', response);
+        // console.log('First reservation resource:', response.reservations[0]?.resource);
+        setReservations(response.reservations);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to fetch reservations';
+        setError(message);
+        toast.error(message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservations();
+  }, []);
+
+  const handleCancel = async (reservation: Reservation) => {
+    const accessToken = Cookies.get("accessToken");
+    if (!accessToken) return;
+
+    try {
+      await resourceService.updateReservation(
+        reservation.id,
+        'Rejected',
+        accessToken
+      );
+      toast.success('Reservation cancelled successfully');
+      const response = await resourceService.getReservationsByID(accessToken);
+      setReservations(response.reservations);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to cancel reservation';
+      toast.error(message);
+    }
   };
 
-  const handleExtend = (reservation: Reservation) => {
-    toast.success(`Extended reservation for ${reservation.resource}`, {
-      description: 'Your reservation has been extended by 1 hour.',
-    });
+  const handleExtend = async (reservation: Reservation) => {
+    const accessToken = Cookies.get("accessToken");
+    if (!accessToken) return;
+
+    try {
+      const extendedEndTime = new Date(reservation.endTime);
+      extendedEndTime.setHours(extendedEndTime.getHours() + 1);
+      
+      await resourceService.updateReservation(
+        reservation.id,
+        'Approved',
+        accessToken
+      );
+      toast.success('Reservation extended successfully');
+      const response = await resourceService.getReservationsByID(accessToken);
+      setReservations(response.reservations);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to extend reservation';
+      toast.error(message);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        {error}
+      </div>
+    );
+  }
+
+  const activeReservations = reservations.filter(
+    (r) => !r.isDeleted && r.status !== 'Rejected' && r.status !== 'Cancelled'
+  );
+
+  // console.log('activeReservations:', activeReservations);
 
   return (
     <div className="space-y-6 animate-fade-in">
       <h2 className="text-2xl font-bold">Active & Upcoming Reservations</h2>
       
-      <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="reservation-table">
-          <thead>
-            <tr>
-              <th className="reservation-th rounded-tl-lg">Resource</th>
-              <th className="reservation-th">Type</th>
-              <th className="reservation-th">Date</th>
-              <th className="reservation-th">Time</th>
-              <th className="reservation-th">Status</th>
-              <th className="reservation-th rounded-tr-lg">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reservations.map((reservation) => (
-              <tr key={reservation.id} className="animate-slide-in">
-                <td className="reservation-td font-medium">{reservation.resource}</td>
-                <td className="reservation-td">{reservation.type}</td>
-                <td className="reservation-td">{reservation.date}</td>
-                <td className="reservation-td">{reservation.time}</td>
-                <td className="reservation-td">
-                  <span className="status-active">{reservation.status}</span>
-                </td>
-                <td className="reservation-td">
-                  <div className="flex items-center">
-                    <button
-                      onClick={() => handleCancel(reservation)}
-                      className="action-btn-cancel"
-                      aria-label="Cancel reservation"
-                    >
-                      <X size={18} className="mr-1" />
-                      <span>Cancel</span>
-                    </button>
-                    <button
-                      onClick={() => handleExtend(reservation)}
-                      className="action-btn-extend"
-                      aria-label="Extend reservation"
-                    >
-                      <ArrowRight size={18} className="mr-1" />
-                      <span>Extend</span>
-                    </button>
-                  </div>
-                </td>
+      {activeReservations.length === 0 ? (
+        <div className="text-center text-gray-500 p-4">
+          No active reservations found.
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-border">
+          <table className="reservation-table">
+            <thead>
+              <tr>
+                <th className="reservation-th rounded-tl-lg">Resource</th>
+                <th className="reservation-th">Start Time</th>
+                <th className="reservation-th">End Time</th>
+                <th className="reservation-th rounded-tr-lg">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {activeReservations.map((reservation) => (
+                <tr key={reservation.id} className="animate-slide-in">
+                  <td className="reservation-td font-medium">
+                    {reservation.resource?.name || 'N/A'}
+                  </td>
+                  <td className="reservation-td">
+                    {new Date(reservation.startTime).toLocaleString()}
+                  </td>
+                  <td className="reservation-td">
+                    {new Date(reservation.endTime).toLocaleString()}
+                  </td>
+                  <td className="reservation-td">
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => handleCancel(reservation)}
+                        className="action-btn-cancel"
+                        aria-label="Cancel reservation"
+                        disabled={!reservation.resource || reservation.status === 'Rejected' || reservation.status === 'Cancelled'}
+                      >
+                        <X size={18} className="mr-1" />
+                        <span>Cancel</span>
+                      </button>
+                      <button
+                        onClick={() => handleExtend(reservation)}
+                        className="action-btn-extend"
+                        aria-label="Extend reservation"
+                        disabled={!reservation.resource || reservation.status !== 'Approved'}
+                      >
+                        <ArrowRight size={18} className="mr-1" />
+                        <span>Return</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
