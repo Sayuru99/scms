@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { courseService } from "@/lib/api";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import { Plus } from "lucide-react";
 
 interface CreateCourseDialogProps {
   newCourse: { code: string; name: string; description: string; credits: string };

@@ -1,5 +1,7 @@
+
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import { courseService } from "../../lib/api";
 import { toast } from "react-toastify";
 import AvailableCoursesTable from "./components/AvailableCoursesTable";
@@ -34,7 +36,7 @@ function Courses() {
         console.error("Failed to decode token:", err);
       }
     }
-  }, [userId, permissions]);
+  }, []);
 
   const fetchEnrolledCourses = async (token: string) => {
     try {
@@ -75,7 +77,9 @@ function Courses() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem className="hidden md:block">
-            <BreadcrumbLink href="#">Courses</BreadcrumbLink>
+            <BreadcrumbLink href="#">
+              Courses
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator className="hidden md:block" />
           <BreadcrumbItem>
@@ -92,9 +96,8 @@ function Courses() {
               newCourse={newCourse}
               setNewCourse={setNewCourse}
               onCreate={() => {
-                const token = Cookies.get("accessToken") || "";
-                fetchEnrolledCourses(token);
-                fetchAvailableCourses(token);
+                fetchEnrolledCourses(Cookies.get("accessToken") || "");
+                fetchAvailableCourses(Cookies.get("accessToken") || "");
               }}
             />
           )}
@@ -110,9 +113,8 @@ function Courses() {
               editCourse={editCourse}
               setEditCourse={setEditCourse}
               onUpdate={() => {
-                const token = Cookies.get("accessToken") || "";
-                fetchEnrolledCourses(token);
-                fetchAvailableCourses(token);
+                fetchEnrolledCourses(Cookies.get("accessToken") || "");
+                fetchAvailableCourses(Cookies.get("accessToken") || "");
               }}
             />
           )}

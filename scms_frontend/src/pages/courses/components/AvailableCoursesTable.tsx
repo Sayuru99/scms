@@ -8,8 +8,10 @@ import { Pencil } from "lucide-react";
 
 interface AvailableCoursesTableProps {
   courses: Course[];
-  permissions: string[];
-  onEnroll: (courseId: number) => Promise<void>;
+  roleFilter: string;
+  setRoleFilter: (value: string) => void;
+  setCourses: React.Dispatch<React.SetStateAction<Course[]>>;
+  setFilteredCourses: React.Dispatch<React.SetStateAction<Course[]>>;
 }
 
 export default function AvailableCoursesTable({ courses, roleFilter, setRoleFilter }: AvailableCoursesTableProps) {
