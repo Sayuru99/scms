@@ -121,11 +121,11 @@ const Calendar: React.FC = () => {
         {calendarContent}
       </div>
       
-      <EventDetailsModal 
+      {/* <EventDetailsModal 
         event={selectedEvent} 
         isOpen={!!selectedEvent} 
         onClose={handleCloseModal} 
-      />
+      /> */}
     </div>
   );
 };

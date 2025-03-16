@@ -15,7 +15,7 @@ export interface Event {
   export const events: Event[] = [
     {
       id: '1',
-      title: 'Digital Art Showcase',
+      title: 'Software Development Practice',
       date: new Date(2025, 2, 8, 10, 0), // March 8, 2025
       endDate: new Date(2025, 2, 8, 16, 0),
       location: 'Art Gallery - New York',
@@ -27,7 +27,7 @@ export interface Event {
     },
     {
       id: '2',
-      title: 'Web Dev Bootcamp',
+      title: 'Web Development',
       date: new Date(2025, 2, 11, 9, 0), // March 11, 2025
       endDate: new Date(2025, 2, 11, 17, 0),
       location: 'Tech Hub - San Francisco',
@@ -39,7 +39,7 @@ export interface Event {
     },
     {
       id: '3',
-      title: 'JavaScript Workshop',
+      title: 'Wesak Day Celebration',
       date: new Date(2025, 2, 12, 14, 0), // March 12, 2025
       endDate: new Date(2025, 2, 12, 17, 0),
       location: 'London',
@@ -52,7 +52,7 @@ export interface Event {
     },
     {
       id: '4',
-      title: 'UI/UX Design Sprint',
+      title: 'Databse Design',
       date: new Date(2025, 2, 12, 10, 0), // March 12, 2025
       endDate: new Date(2025, 2, 12, 15, 30),
       location: 'Design Studio - Berlin',
@@ -64,7 +64,7 @@ export interface Event {
     },
     {
       id: '5',
-      title: 'Web Dev Bootcamp',
+      title: 'Exam Software Development Practice',
       date: new Date(2025, 2, 14, 9, 0), // March 14, 2025
       endDate: new Date(2025, 2, 14, 17, 0),
       location: 'Online',
@@ -77,7 +77,7 @@ export interface Event {
     },
     {
       id: '6',
-      title: 'Photography Masterclass',
+      title: 'Hackathon',
       date: new Date(2025, 2, 16, 11, 0), // March 16, 2025
       endDate: new Date(2025, 2, 16, 16, 0),
       location: 'Central Park - New York',
@@ -89,7 +89,7 @@ export interface Event {
     },
     {
       id: '7',
-      title: 'Graphic Design Workshop',
+      title: 'Hackathon',
       date: new Date(2025, 2, 20, 13, 0), // March 20, 2025
       endDate: new Date(2025, 2, 20, 17, 0),
       location: 'Creative Hub - Toronto',
