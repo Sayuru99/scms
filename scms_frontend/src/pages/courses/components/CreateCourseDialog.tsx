@@ -42,7 +42,9 @@ export default function CreateCourseDialog({ newCourse, setNewCourse, onCreate }
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="mb-4"><Plus className="w-4 h-4 mr-2" /> Add Course</Button>
+        <div className="flex justify-end mb-4">
+          <Button><Plus className="w-4 h-4 mr-2" /> Add Course</Button>
+        </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
