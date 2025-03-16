@@ -1,4 +1,3 @@
-
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -9,12 +8,14 @@ import RootLayout from "./layouts/root.layout.tsx";
 import MainLayout from "./layouts/main.layout.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import Users from "./pages/users/Users.tsx";
 import Permissions from "./pages/permissions/Permissions.tsx";
 import Resources from "./pages/resources/Resources.tsx";
-import Courses from "./pages/courses/Course.tsx"; 
+import Courses from "./pages/courses/Course.tsx";
 import Reservation from "./pages/reservation/Reservation.tsx";
+import Chat from "./pages/chat/Chat.tsx";
+import { AuthProvider } from "./context/AuthContext.tsx";
+import ProtectedRoute from "./context/ProtectedRoute.tsx";
 
 const router = createBrowserRouter([
   {
@@ -32,64 +33,40 @@ const router = createBrowserRouter([
           {
             element: <MainLayout />,
             children: [
-              {
-                path: "/",
-                element: <Dashboard />,
-              },
-              {
-                path: "/users",
-                element: <Users />,
-              },
-              {
-                path: "/events",
-                element: <div>Events (TBD)</div>,
-              },
-              {
-                path: "/permissions",
-                element: <Permissions />,
-              },
-              {
-                path: "/calendar",
-                element: <div>Calendar (TBD)</div>,
-              },
-              {
-                path: "/resources",
-                element: <Resources />,
-              },
-              {
-                path: "/reservation",
-                element: <Reservation />,
-              },
-              {
-                path: "/courses", 
-                element: <Courses />,
-              },
+              { path: "/", element: <Dashboard /> },
+              { path: "/users", element: <Users /> },
+              { path: "/events", element: <div>Events (TBD)</div> },
+              { path: "/permissions", element: <Permissions /> },
+              { path: "/calendar", element: <div>Calendar (TBD)</div> },
+              { path: "/resources", element: <Resources /> },
+              { path: "/reservation", element: <Reservation /> },
+              { path: "/courses", element: <Courses /> },
+              { path: "/chat", element: <Chat /> },
             ],
           },
         ],
       },
-      {
-        path: "/login",
-        element: <Login />,
-      },
+      { path: "/login", element: <Login /> },
     ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
-    <ToastContainer
-      position="top-right"
-      autoClose={3000}
-      hideProgressBar={false}
-      newestOnTop={true}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
-    />
+    <AuthProvider>
+      <RouterProvider router={router} />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </AuthProvider>
   </StrictMode>
 );

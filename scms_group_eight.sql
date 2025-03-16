@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 12, 2025 at 07:09 AM
+-- Generation Time: Mar 16, 2025 at 03:03 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -165,6 +165,14 @@ CREATE TABLE `messages` (
   `recipientId` varchar(36) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `content`, `is_read`, `is_deleted`, `sent_at`, `senderId`, `groupId`, `recipientId`) VALUES
+(3, 'hi', 0, 0, '2025-03-16 19:30:42.038746', '22960ecc-c7b5-48ef-8463-a9f7b2831d6b', NULL, '3278871c-dfe1-48c2-a311-e90d1ad90ce6'),
+(4, 'hello', 0, 0, '2025-03-16 19:31:38.359209', '22960ecc-c7b5-48ef-8463-a9f7b2831d6b', NULL, '3278871c-dfe1-48c2-a311-e90d1ad90ce6');
+
 -- --------------------------------------------------------
 
 --
@@ -222,6 +230,7 @@ CREATE TABLE `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `name`, `category`, `scope`, `description`, `is_active`, `is_deleted`, `created_at`, `updated_at`) VALUES
+('', 'read:messages', 'chat', NULL, 'View chat messages', 1, 0, '2025-03-16 18:51:46.106400', '2025-03-16 18:51:46.106400'),
 ('10000000-0000-0000-0000-000000000001', 'create:users', 'Users', 'system', 'Updated view reservations permission on 2025-03-11 08:01 AM PDT', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-11 20:51:01.000000'),
 ('10000000-0000-0000-0000-000000000002', 'read:users', 'Users', 'system', 'View users', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-09 20:01:03.000000'),
 ('10000000-0000-0000-0000-000000000003', 'update:users', 'Users', 'system', 'Update users', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-09 20:01:03.000000'),
@@ -247,6 +256,7 @@ INSERT INTO `permissions` (`id`, `name`, `category`, `scope`, `description`, `is
 ('50000000-0000-0000-0000-000000000002', 'read:roles', 'Roles', 'system', 'View roles', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-09 20:01:03.000000'),
 ('50000000-0000-0000-0000-000000000003', 'update:roles', 'Roles', 'system', 'Update roles', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-09 20:01:03.000000'),
 ('50000000-0000-0000-0000-000000000004', 'delete:roles', 'Roles', 'system', 'Delete roles', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-09 20:01:03.000000'),
+('52c76365-4b1a-4f87-bd01-cc2a52947395', 'read:groups', 'chat', NULL, 'dea', 1, 0, '2025-03-16 19:12:33.461200', '2025-03-16 19:12:33.461200'),
 ('60000000-0000-0000-0000-000000000001', 'create:permissions', 'Permissions', 'system', 'Create permissions', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-09 20:01:03.000000'),
 ('60000000-0000-0000-0000-000000000002', 'read:permissions', 'Permissions', 'system', 'View permissions', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-09 20:01:03.000000'),
 ('60000000-0000-0000-0000-000000000003', 'update:permissions', 'Permissions', 'system', 'Update permissions', 1, 0, '2025-03-09 20:01:03.000000', '2025-03-09 20:01:03.000000'),
@@ -255,8 +265,10 @@ INSERT INTO `permissions` (`id`, `name`, `category`, `scope`, `description`, `is
 ('9e62e81f-df1e-4fcd-875e-0f10d5f1ffbe', 'update:reservations', 'Reservations', 'reservations', 'Approve or reject reservations', 1, 0, '2025-03-11 00:32:39.000000', '2025-03-11 00:32:39.000000'),
 ('a572f9c5-30f9-4f1d-9d70-68723171d2f0', 'read:resource_types', 'Resources', 'resources', 'View resource types', 1, 0, '2025-03-11 00:49:20.000000', '2025-03-11 00:49:20.000000'),
 ('b6cb3fcb-4cd5-42cc-95e6-f75a0d57f92f', 'create:resource_types', 'Resources', 'resources', 'Create resource types', 1, 0, '2025-03-11 00:49:20.000000', '2025-03-11 00:49:20.000000'),
+('b7626173-83da-4e64-b9dc-335c0c92aeb5', 'create:enrollments', 'chat', NULL, 'dumb', 1, 0, '2025-03-16 19:12:24.590515', '2025-03-16 19:12:24.590515'),
 ('c1b79814-c4e9-4f1f-bf56-bf274b94a105', 'update:resource_types', 'Resources', 'resources', 'Update resource types', 1, 0, '2025-03-11 00:49:20.000000', '2025-03-11 00:49:20.000000'),
-('d4db47da-9b2d-4ffb-b9a7-456db52e545b', 'delete:resource_types', 'Resources', 'resources', 'Delete resource types', 1, 0, '2025-03-11 00:49:20.000000', '2025-03-11 00:49:20.000000');
+('d4db47da-9b2d-4ffb-b9a7-456db52e545b', 'delete:resource_types', 'Resources', 'resources', 'Delete resource types', 1, 0, '2025-03-11 00:49:20.000000', '2025-03-11 00:49:20.000000'),
+('d8ea5554-4c2f-434b-94b1-aefd7b05c79c', 'create:messages', 'chat', NULL, 'create new messages', 1, 0, '2025-03-16 19:17:19.307742', '2025-03-16 19:17:19.307742');
 
 -- --------------------------------------------------------
 
@@ -363,6 +375,7 @@ CREATE TABLE `roles_permissions` (
 --
 
 INSERT INTO `roles_permissions` (`rolesId`, `permissionsId`) VALUES
+('119f6092-72b7-4f0c-9e56-82a60cec28f2', ''),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '10000000-0000-0000-0000-000000000001'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '10000000-0000-0000-0000-000000000002'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '10000000-0000-0000-0000-000000000003'),
@@ -388,6 +401,7 @@ INSERT INTO `roles_permissions` (`rolesId`, `permissionsId`) VALUES
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '50000000-0000-0000-0000-000000000002'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '50000000-0000-0000-0000-000000000003'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '50000000-0000-0000-0000-000000000004'),
+('119f6092-72b7-4f0c-9e56-82a60cec28f2', '52c76365-4b1a-4f87-bd01-cc2a52947395'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '60000000-0000-0000-0000-000000000001'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '60000000-0000-0000-0000-000000000002'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '60000000-0000-0000-0000-000000000003'),
@@ -395,8 +409,10 @@ INSERT INTO `roles_permissions` (`rolesId`, `permissionsId`) VALUES
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', '9e62e81f-df1e-4fcd-875e-0f10d5f1ffbe'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', 'a572f9c5-30f9-4f1d-9d70-68723171d2f0'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', 'b6cb3fcb-4cd5-42cc-95e6-f75a0d57f92f'),
+('119f6092-72b7-4f0c-9e56-82a60cec28f2', 'b7626173-83da-4e64-b9dc-335c0c92aeb5'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', 'c1b79814-c4e9-4f1f-bf56-bf274b94a105'),
 ('119f6092-72b7-4f0c-9e56-82a60cec28f2', 'd4db47da-9b2d-4ffb-b9a7-456db52e545b'),
+('119f6092-72b7-4f0c-9e56-82a60cec28f2', 'd8ea5554-4c2f-434b-94b1-aefd7b05c79c'),
 ('34748133-5790-4d6e-adc4-61f6738f90b4', '1e3f5795-9576-460c-884f-3e0fc786738d'),
 ('34748133-5790-4d6e-adc4-61f6738f90b4', '20000000-0000-0000-0000-000000000001'),
 ('34748133-5790-4d6e-adc4-61f6738f90b4', '20000000-0000-0000-0000-000000000002'),
@@ -448,7 +464,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `email`, `password`, `first_name`, `last_name`, `phone_number`, `is_active`, `is_first_login`, `is_deleted`, `refreshTokens`, `last_activity`, `created_at`, `updated_at`, `roleId`, `directPermissions`) VALUES
 ('050621d4-2562-4cfa-8cdc-cfa76c595497', 'sayuru.staff@scms.com', '$2a$10$dzHChPGDzIIxc27Miny2W.SMieuE41rc/WpbDdm.1KLv2Qt3WrU3S', 'Sayuru', 'De Alwis', '0778279803', 1, 1, 0, NULL, NULL, '2025-03-09 19:38:37.260302', '2025-03-09 19:39:09.000000', '770c1038-eb9b-40c2-b114-3335c6e57c05', NULL),
-('22960ecc-c7b5-48ef-8463-a9f7b2831d6b', 'admin@scms.com', '$2a$10$CzD8HhFZbNCPOpJn7iehxuhI6XPea48TDs/JApL0qXwtNYtsq74qG', 'Sayuru', 'De Alwis', '+94778279803', 1, 1, 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjk2MGVjYy1jN2I1LTQ4ZWYtODQ2My1hOWY3YjI4MzFkNmIiLCJpYXQiOjE3NDE3MDg0OTcsImV4cCI6MTc0MjMxMzI5N30.vJWOG9A38hDk4TkeZCNe5o8LihvYt56Ge5dQzPBHoSA,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjk2MGVjYy1jN2I1LTQ4ZWYtODQ2My1hOWY3YjI4MzFkNmIiLCJpYXQiOjE3NDE3MDg1MzAsImV4cCI6MTc0MjMxMzMzMH0.k40dYCjj2qyWJy5-9-GyM0raM12NTLAPXym1cNJMDdw,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjk2MGVjYy1jN2I1LTQ4ZWYtODQ2My1hOWY3YjI4MzFkNmIiLCJpYXQiOjE3NDE3MTYxOTYsImV4cCI6MTc0MjMyMDk5Nn0.yO8XmTGqhhqY13RVgERwR_q7BSsDUqrkXUDqE4Fz0LI', '2025-03-11 15:56:13', '2025-03-11 21:24:37.647065', '2025-03-11 23:33:16.000000', '119f6092-72b7-4f0c-9e56-82a60cec28f2', 'read:events,reserve:resources'),
+('22960ecc-c7b5-48ef-8463-a9f7b2831d6b', 'admin@scms.com', '$2a$10$CzD8HhFZbNCPOpJn7iehxuhI6XPea48TDs/JApL0qXwtNYtsq74qG', 'Sayuru', 'De Alwis', '+94778279803', 1, 1, 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjk2MGVjYy1jN2I1LTQ4ZWYtODQ2My1hOWY3YjI4MzFkNmIiLCJpYXQiOjE3NDE3MDg0OTcsImV4cCI6MTc0MjMxMzI5N30.vJWOG9A38hDk4TkeZCNe5o8LihvYt56Ge5dQzPBHoSA,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjk2MGVjYy1jN2I1LTQ4ZWYtODQ2My1hOWY3YjI4MzFkNmIiLCJpYXQiOjE3NDE3MDg1MzAsImV4cCI6MTc0MjMxMzMzMH0.k40dYCjj2qyWJy5-9-GyM0raM12NTLAPXym1cNJMDdw,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjk2MGVjYy1jN2I1LTQ4ZWYtODQ2My1hOWY3YjI4MzFkNmIiLCJpYXQiOjE3NDIxMjk2OTMsImV4cCI6MTc0MjczNDQ5M30.PHO29WsGjDhQaS6Z5HM7Xr8rn3Pdc50-cyrToKBtu9A,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjk2MGVjYy1jN2I1LTQ4ZWYtODQ2My1hOWY3YjI4MzFkNmIiLCJpYXQiOjE3NDIxMzE3MTksImV4cCI6MTc0MjczNjUxOX0.uwtxhWUbO8onqMv1yebGbfThF1trI36DXNNquRDUB4U,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjk2MGVjYy1jN2I1LTQ4ZWYtODQ2My1hOWY3YjI4MzFkNmIiLCJpYXQiOjE3NDIxMzM2MzUsImV4cCI6MTc0MjczODQzNX0.SUrct4pIYmV-ZyHsNYQR3GPRW243fv9YLgXylQyWvlY', '2025-03-16 13:30:17', '2025-03-11 21:24:37.647065', '2025-03-16 19:30:35.000000', '119f6092-72b7-4f0c-9e56-82a60cec28f2', 'read:events,reserve:resources'),
 ('3278871c-dfe1-48c2-a311-e90d1ad90ce6', 'sadaruwan.student@scms.com', '$2a$10$NJ.IDLnbgVj60jL.4HGN/.VsiKEDE2O.EdVdEJF2BPgSpMOP5ENsC', 'Sadaruwan', 'Gamage', '0712345678', 1, 1, 0, NULL, NULL, '2025-03-09 22:20:05.637969', '2025-03-09 22:20:05.637969', '95a53ac3-9ba9-4593-afca-63788ea757de', NULL),
 ('6a074915-40b4-4457-a741-5c875f56e28b', 'janani.lecturer@scms.com', '$2a$10$5ZlJ/CU4hleN2E16W9k.dODqpSe0zo.BUJ3iM1M5ueOI81ftAckv6', 'janani', 'Balasooriya', '0771233211', 1, 1, 0, NULL, NULL, '2025-03-09 21:28:23.827161', '2025-03-09 21:28:23.827161', '34748133-5790-4d6e-adc4-61f6738f90b4', 'create:events,read:events,update:events,delete:events,create:courses,read:courses,update:courses,delete:courses,view:events'),
 ('6ae18774-5595-48f5-84d8-b7eacec71544', 'sayuru99@scms.com', '$2a$10$uIa27OfxC9Yt38qDdnk/keX6293iYV1v6WZ.atj8R8J.810sMDgY6', 'Sayuru', 'De Alwis Updated', '+94778279803', 1, 0, 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWUxODc3NC01NTk1LTQ4ZjUtODRkOC1iN2VhY2VjNzE1NDQiLCJpYXQiOjE3NDE3MDYwNzUsImV4cCI6MTc0MjMxMDg3NX0.JDEMOl8pWs8_nUtjYXMUeBOwHn4SkTeB1xnSyBqpL5E,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWUxODc3NC01NTk1LTQ4ZjUtODRkOC1iN2VhY2VjNzE1NDQiLCJpYXQiOjE3NDE3MDYxNDYsImV4cCI6MTc0MjMxMDk0Nn0.bmq2du4z6a443lqi3FRa-vnbST13wqC_mJkaK29-ULg,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWUxODc3NC01NTk1LTQ4ZjUtODRkOC1iN2VhY2VjNzE1NDQiLCJpYXQiOjE3NDE3MDYxODYsImV4cCI6MTc0MjMxMDk4Nn0.bKK_8fS04NvplajvCliodtLQk-x6kCAC58LcKgwN-y8,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWUxODc3NC01NTk1LTQ4ZjUtODRkOC1iN2VhY2VjNzE1NDQiLCJpYXQiOjE3NDE3MDYyMTAsImV4cCI6MTc0MjMxMTAxMH0.XEvjTffIMxMhLtet1ryjpBzRYx49FbPryNq0EVW5TGo,eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWUxODc3NC01NTk1LTQ4ZjUtODRkOC1iN2VhY2VjNzE1NDQiLCJpYXQiOjE3NDE3MDcyOTksImV4cCI6MTc0MjMxMjA5OX0.Q5Rr4aFaN_clcaHtFcVcstIRWJlew8RncCSLdJWG4fE', '2025-03-11 15:34:55', '2025-03-06 04:21:22.214774', '2025-03-11 21:05:37.000000', '95a53ac3-9ba9-4593-afca-63788ea757de', 'read:events,reserve:resources'),
@@ -626,7 +642,7 @@ ALTER TABLE `groups`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `modules`

@@ -1,7 +1,7 @@
-
+// src/components/shared/Sidebar.tsx
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn, FaLock } from "react-icons/fa";
+import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn, FaLock, FaComments } from "react-icons/fa"; // Add FaComments
 import { Album, BookOpen, Briefcase } from "lucide-react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -33,11 +33,12 @@ const Sidebar = () => {
     { name: "Dashboard", path: "/", icon: <FaTachometerAlt className="w-5 h-5" />, requiredPermission: null },
     { name: "Users", path: "/users", icon: <FaUsers className="w-5 h-5" />, requiredPermission: "read:users" },
     { name: "Permissions", path: "/permissions", icon: <FaLock className="w-5 h-5" />, requiredPermission: "read:roles" },
-    { name: "Courses", path: "/courses", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:courses" }, 
+    { name: "Courses", path: "/courses", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "read:courses" },
     { name: "Resources", path: "/resources", icon: <Briefcase className="w-5 h-5" />, requiredPermission: "read:resources" },
     { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" },
     { name: "Reservation", path: "/reservation", icon: <Album className="w-5 h-5" />, requiredPermission: "reserve:resources" },
     { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
+    { name: "Chat", path: "/chat", icon: <FaComments className="w-5 h-5" />, requiredPermission: "read:messages" }, // Added Chat
   ];
 
   const filteredMenuItems = menuItems.filter((item) =>

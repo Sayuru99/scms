@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { authService } from "../lib/api";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 interface JwtPayload {
   userId: string;
@@ -13,6 +14,7 @@ interface JwtPayload {
 }
 
 const ProtectedRoute = () => {
+  const { userId, setAuth } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -20,27 +22,26 @@ const ProtectedRoute = () => {
       const accessToken = Cookies.get("accessToken");
       const refreshToken = Cookies.get("refreshToken");
 
-      
-      if (accessToken) {
+      if (userId && accessToken) {
         try {
           const decoded: JwtPayload = jwtDecode(accessToken);
           const currentTime = Math.floor(Date.now() / 1000);
           if (decoded.exp > currentTime) {
             setIsAuthenticated(true);
-            return; 
+            return;
           }
         } catch (err) {
           console.error("Invalid access token:", err);
         }
       }
 
-      
       if (refreshToken) {
         try {
           const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
             await authService.refreshToken(refreshToken);
-          Cookies.set("accessToken", newAccessToken, { expires: 1 / 96 }); 
-          Cookies.set("refreshToken", newRefreshToken, { expires: 7 }); 
+          setAuth(newAccessToken); 
+          Cookies.set("accessToken", newAccessToken, { expires: 1 / 96 });
+          Cookies.set("refreshToken", newRefreshToken, { expires: 7 });
           setIsAuthenticated(true);
           toast.success("Session refreshed successfully");
           return;
@@ -52,12 +53,11 @@ const ProtectedRoute = () => {
         }
       }
 
-      
       setIsAuthenticated(false);
     };
 
     checkAuth();
-  }, []);
+  }, [userId, setAuth]);
 
   if (isAuthenticated === null) {
     return (
@@ -83,7 +83,7 @@ const ProtectedRoute = () => {
           ></path>
         </svg>
       </div>
-    ); 
+    );
   }
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
