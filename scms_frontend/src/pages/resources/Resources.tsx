@@ -1,4 +1,4 @@
-// src/pages/resources/Resources.tsx
+
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";

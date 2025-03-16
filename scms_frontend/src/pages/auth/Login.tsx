@@ -4,15 +4,8 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { authService } from "../../lib/api";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../../context/AuthContext";
 import Cookies from "js-cookie";
-
-interface JwtPayload {
-  userId: string;
-  role: string;
-  permissions: string[];
-  exp: number;
-}
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -21,6 +14,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const { setAuth } = useAuth();
 
   const graduationCapImg =
     "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80";
@@ -34,13 +28,10 @@ export default function Login() {
 
       const accessTokenExpires = rememberMe ? 7 : 1 / 96; 
       const refreshTokenExpires = rememberMe ? 30 : 7; 
+      setAuth(accessToken); 
       Cookies.set("accessToken", accessToken, { expires: accessTokenExpires });
       Cookies.set("refreshToken", refreshToken, { expires: refreshTokenExpires });
 
-      const decodedToken = jwtDecode<JwtPayload>(accessToken);
-      console.log("User permissions:", decodedToken.permissions);
-
-      
       navigate("/");
     } catch (err) {
       console.error("Login failed:", err);
@@ -201,3 +192,4 @@ export default function Login() {
     </div>
   );
 }
+

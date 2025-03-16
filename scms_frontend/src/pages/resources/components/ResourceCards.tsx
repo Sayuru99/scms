@@ -1,4 +1,4 @@
-// src/pages/resources/components/ResourceCards.tsx
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ResourceCardsProps {
@@ -16,16 +16,6 @@ export default function ResourceCards({ resources, reservations, totalResources 
         </CardHeader>
         <CardContent>
           <p className="text-2xl font-bold">{totalResources}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Pending Requests</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-2xl font-bold">
-            {reservations.filter((r) => r.status === "Requested").length}
-          </p>
         </CardContent>
       </Card>
       <Card>

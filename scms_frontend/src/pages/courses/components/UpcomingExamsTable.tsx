@@ -1,37 +1,45 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+interface Exam {
+  id: number;
+  name: string;
+  date: string;
+  course: string;
+}
 
 interface UpcomingExamsTableProps {
-  exams: any[];
+  exams: Exam[];
 }
 
 export default function UpcomingExamsTable({ exams }: UpcomingExamsTableProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Upcoming Exams</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Exam Name</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Course</TableHead>
+    <div className="mt-6">
+      <h2 className="text-2xl font-semibold mb-4">Upcoming Exams</h2>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Course</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {exams.map((exam) => (
+            <TableRow key={exam.id}>
+              <TableCell>{exam.name}</TableCell>
+              <TableCell>{new Date(exam.date).toLocaleString()}</TableCell>
+              <TableCell>{exam.course}</TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {exams.map((exam) => (
-              <TableRow key={exam.id}>
-                <TableCell>{exam.name}</TableCell>
-                <TableCell>{new Date(exam.date).toLocaleString()}</TableCell>
-                <TableCell>{exam.course}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

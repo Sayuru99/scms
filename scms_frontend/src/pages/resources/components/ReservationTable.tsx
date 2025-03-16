@@ -1,8 +1,9 @@
-// src/pages/resources/components/ReservationTable.tsx
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckCircle, XCircle } from "lucide-react";
+import { Book, CheckCircle, XCircle } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface ReservationTableProps {
   reservations: any[];
@@ -15,17 +16,16 @@ export default function ReservationTable({ reservations, permissions, onApproveR
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Recent Requests</CardTitle>
+        <CardTitle>Reserved Resources</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
+              <TableHead>User Id</TableHead>
               <TableHead>Resource</TableHead>
               <TableHead>Start Time</TableHead>
               <TableHead>End Time</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -36,36 +36,16 @@ export default function ReservationTable({ reservations, permissions, onApproveR
                 <TableCell>{reservation.resource.name}</TableCell>
                 <TableCell>{new Date(reservation.startTime).toLocaleString()}</TableCell>
                 <TableCell>{new Date(reservation.endTime).toLocaleString()}</TableCell>
-                <TableCell>{reservation.status}</TableCell>
                 <TableCell>
-                  {reservation.status === "Requested" && permissions.includes("update:reservations") && (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onApproveReject(reservation.id, "Approved")}
-                        className="mr-2"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onApproveReject(reservation.id, "Rejected")}
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </Button>
-                    </>
-                  )}
-                  {reservation.status === "Approved" && permissions.includes("update:reservations") && (
-                    <Button
-                      variant="outline"
+                <Button
+                      variant="destructive"
                       size="sm"
-                      onClick={() => onReturnResource(reservation.resource.id)}
+                      onClick={() => {
+                        toast.info("Not completed yet!");
+                      }}
                     >
-                      Return
-                    </Button>
-                  )}
+                      <Book className="h-4 w-4" /> Return
+                </Button>                  
                 </TableCell>
               </TableRow>
             ))}

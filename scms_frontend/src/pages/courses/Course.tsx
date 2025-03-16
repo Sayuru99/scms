@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
 import { courseService } from "../../lib/api";
 import { toast } from "react-toastify";
 import AvailableCoursesTable from "./components/AvailableCoursesTable";
@@ -35,7 +34,7 @@ function Courses() {
         console.error("Failed to decode token:", err);
       }
     }
-  }, []);
+  }, [userId, permissions]);
 
   const fetchEnrolledCourses = async (token: string) => {
     try {
@@ -93,8 +92,9 @@ function Courses() {
               newCourse={newCourse}
               setNewCourse={setNewCourse}
               onCreate={() => {
-                fetchEnrolledCourses(Cookies.get("accessToken") || "");
-                fetchAvailableCourses(Cookies.get("accessToken") || "");
+                const token = Cookies.get("accessToken") || "";
+                fetchEnrolledCourses(token);
+                fetchAvailableCourses(token);
               }}
             />
           )}
@@ -110,8 +110,9 @@ function Courses() {
               editCourse={editCourse}
               setEditCourse={setEditCourse}
               onUpdate={() => {
-                fetchEnrolledCourses(Cookies.get("accessToken") || "");
-                fetchAvailableCourses(Cookies.get("accessToken") || "");
+                const token = Cookies.get("accessToken") || "";
+                fetchEnrolledCourses(token);
+                fetchAvailableCourses(token);
               }}
             />
           )}

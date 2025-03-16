@@ -1,23 +1,42 @@
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { courseService } from "@/lib/api";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
+
+interface Course {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+  credits: number;
+}
 
 interface EditCourseDialogProps {
-  editCourse: any;
-  setEditCourse: (course: any | null) => void;
+  editCourse: Course;
+  setEditCourse: React.Dispatch<React.SetStateAction<Course | null>>;
   onUpdate: () => void;
 }
 
-export default function EditCourseDialog({ editCourse, setEditCourse, onUpdate }: EditCourseDialogProps) {
-  const handleUpdateCourse = async (e: React.FormEvent) => {
+export default function EditCourseDialog({
+  editCourse,
+  setEditCourse,
+  onUpdate,
+}: EditCourseDialogProps) {
+  const [open, setOpen] = useState(true);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = Cookies.get("accessToken");
-    if (!token || !editCourse) return;
+    if (!token) return;
 
     try {
       await courseService.updateCourse(
@@ -25,14 +44,15 @@ export default function EditCourseDialog({ editCourse, setEditCourse, onUpdate }
         {
           code: editCourse.code,
           name: editCourse.name,
-          description: editCourse.description || undefined,
-          credits: parseInt(editCourse.credits),
+          description: editCourse.description,
+          credits: editCourse.credits,
         },
         token
       );
-      setEditCourse(null);
-      onUpdate();
       toast.success("Course updated successfully");
+      setEditCourse(null);
+      setOpen(false);
+      onUpdate();
     } catch (err) {
       console.error("Failed to update course:", err);
       toast.error("Failed to update course");
@@ -40,45 +60,53 @@ export default function EditCourseDialog({ editCourse, setEditCourse, onUpdate }
   };
 
   return (
-    <Dialog open={!!editCourse} onOpenChange={() => setEditCourse(null)}>
+    <Dialog open={open} onOpenChange={(open) => !open && setEditCourse(null)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Course</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleUpdateCourse} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="editCode">Code</Label>
+            <Label htmlFor="code">Code</Label>
             <Input
-              id="editCode"
+              id="code"
               value={editCourse.code}
-              onChange={(e) => setEditCourse({ ...editCourse, code: e.target.value })}
+              onChange={(e) =>
+                setEditCourse({ ...editCourse, code: e.target.value })
+              }
               required
             />
           </div>
           <div>
-            <Label htmlFor="editName">Name</Label>
+            <Label htmlFor="name">Name</Label>
             <Input
-              id="editName"
+              id="name"
               value={editCourse.name}
-              onChange={(e) => setEditCourse({ ...editCourse, name: e.target.value })}
+              onChange={(e) =>
+                setEditCourse({ ...editCourse, name: e.target.value })
+              }
               required
             />
           </div>
           <div>
-            <Label htmlFor="editDescription">Description</Label>
+            <Label htmlFor="description">Description</Label>
             <Input
-              id="editDescription"
+              id="description"
               value={editCourse.description || ""}
-              onChange={(e) => setEditCourse({ ...editCourse, description: e.target.value })}
+              onChange={(e) =>
+                setEditCourse({ ...editCourse, description: e.target.value })
+              }
             />
           </div>
           <div>
-            <Label htmlFor="editCredits">Credits</Label>
+            <Label htmlFor="credits">Credits</Label>
             <Input
-              id="editCredits"
+              id="credits"
               type="number"
               value={editCourse.credits}
-              onChange={(e) => setEditCourse({ ...editCourse, credits: e.target.value })}
+              onChange={(e) =>
+                setEditCourse({ ...editCourse, credits: parseInt(e.target.value) })
+              }
               required
             />
           </div>

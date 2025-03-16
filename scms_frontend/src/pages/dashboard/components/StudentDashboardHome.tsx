@@ -8,6 +8,12 @@ import { AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import ModuleSelection, { SemesterData } from "./ModuleSelection";
 
+interface Course {
+  id: string;
+  name: string;
+  credits: number;
+}
+
 const exampleSemesters: SemesterData[] = [
   {
     id: "semester1",
@@ -178,7 +184,7 @@ const StudentDashboardHome: React.FC<StudentDashboardHomeProps> = () => {
           <StudentCourseCard
           key={course.id}
           title={course.name}
-          duration={course.credits}
+          duration={course.credits.toString()}
           modules={12}
           isPrimary={true}
           onClick={() => handleCourseClick(course.id)}
