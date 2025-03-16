@@ -1,55 +1,46 @@
+
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import { courseService } from "../../lib/api";
 import { toast } from "react-toastify";
-import { useAuth } from "../../context/AuthContext";
-import EnrolledCoursesTable from "./components/EnrolledCoursesTable";
 import AvailableCoursesTable from "./components/AvailableCoursesTable";
-import UpcomingExamsTable from "./components/UpcomingExamsTable";
 import CreateCourseDialog from "./components/CreateCourseDialog";
 import EditCourseDialog from "./components/EditCourseDialog";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
-interface Course {
-  id: number;
-  code: string;
-  name: string;
-  description?: string;
-  credits: number;
-}
-
-interface Exam {
-  id: number;
-  name: string;
-  date: string;
-  course: string;
+interface JwtPayload {
+  userId: string;
+  role: string;
+  permissions: string[];
+  exp: number;
 }
 
 function Courses() {
-  const { userId, permissions } = useAuth();
-  const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
-  const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
-  const [upcomingExams, setUpcomingExams] = useState<Exam[]>([]);
-  const [newCourse, setNewCourse] = useState({
-    code: "",
-    name: "",
-    description: "",
-    credits: "",
-  });
-  const [editCourse, setEditCourse] = useState<Course | null>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
+  const [availableCourses, setAvailableCourses] = useState<any[]>([]);
+  const [newCourse, setNewCourse] = useState({ code: "", name: "", description: "", credits: "" });
+  const [editCourse, setEditCourse] = useState<any | null>(null);
 
   useEffect(() => {
-    const token = Cookies.get("accessToken");
-    if (token && userId && permissions.includes("read:courses")) {
-      fetchEnrolledCourses(token);
-      fetchAvailableCourses(token);
-      fetchUpcomingExams();
+    const accessToken = Cookies.get("accessToken");
+    if (accessToken) {
+      try {
+        const decoded: JwtPayload = jwtDecode(accessToken);
+        setPermissions(decoded.permissions || []);
+        if (decoded.permissions.includes("read:courses")) {
+          fetchEnrolledCourses(accessToken);
+          fetchAvailableCourses(accessToken);
+        }
+      } catch (err) {
+        console.error("Failed to decode token:", err);
+      }
     }
-  }, [userId, permissions]);
+  }, []);
 
   const fetchEnrolledCourses = async (token: string) => {
     try {
       const data = await courseService.getEnrolledCourses(token);
-      setEnrolledCourses(data.courses);
     } catch (err) {
       console.error("Failed to fetch enrolled courses:", err);
       toast.error("Failed to load enrolled courses");
@@ -64,14 +55,6 @@ function Courses() {
       console.error("Failed to fetch available courses:", err);
       toast.error("Failed to load available courses");
     }
-  };
-
-  const fetchUpcomingExams = () => {
-    
-    setUpcomingExams([
-      { id: 1, name: "Midterm Exam - CS101", date: "2025-03-20T10:00:00", course: "CS101" },
-      { id: 2, name: "Final Exam - MATH201", date: "2025-04-15T14:00:00", course: "MATH201" },
-    ]);
   };
 
   const handleEnroll = async (courseId: number) => {
@@ -89,60 +72,49 @@ function Courses() {
     }
   };
 
-  const handleDeleteCourse = async (courseId: number) => {
-    const token = Cookies.get("accessToken");
-    if (!token) return;
-
-    try {
-      await courseService.deleteCourse(courseId, token);
-      fetchEnrolledCourses(token);
-      fetchAvailableCourses(token);
-      toast.success("Course deleted successfully");
-    } catch (err) {
-      console.error("Failed to delete course:", err);
-      toast.error("Failed to delete course");
-    }
-  };
-
   return (
     <>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbLink href="#">
+              Courses
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator className="hidden md:block" />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Add Course</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       {permissions.includes("read:courses") ? (
         <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6">Courses</h1>
+          {/* <h1 className="text-3xl font-bold mb-6">Courses</h1> */}
 
           {permissions.includes("create:courses") && (
             <CreateCourseDialog
               newCourse={newCourse}
               setNewCourse={setNewCourse}
               onCreate={() => {
-                const token = Cookies.get("accessToken") || "";
-                fetchEnrolledCourses(token);
-                fetchAvailableCourses(token);
+                fetchEnrolledCourses(Cookies.get("accessToken") || "");
+                fetchAvailableCourses(Cookies.get("accessToken") || "");
               }}
             />
           )}
 
-          <EnrolledCoursesTable
-            courses={enrolledCourses}
-            permissions={permissions}
-            onEditCourse={setEditCourse}
-            onDeleteCourse={handleDeleteCourse}
-          />
           <AvailableCoursesTable
             courses={availableCourses}
             permissions={permissions}
             onEnroll={handleEnroll}
           />
-          <UpcomingExamsTable exams={upcomingExams} />
 
           {editCourse && (
             <EditCourseDialog
               editCourse={editCourse}
               setEditCourse={setEditCourse}
               onUpdate={() => {
-                const token = Cookies.get("accessToken") || "";
-                fetchEnrolledCourses(token);
-                fetchAvailableCourses(token);
+                fetchEnrolledCourses(Cookies.get("accessToken") || "");
+                fetchAvailableCourses(Cookies.get("accessToken") || "");
               }}
             />
           )}

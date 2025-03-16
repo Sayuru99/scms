@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { courseService } from "@/lib/api";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import { Plus } from "lucide-react";
 
 interface CreateCourseDialogProps {
   newCourse: { code: string; name: string; description: string; credits: string };
@@ -56,7 +57,9 @@ export default function CreateCourseDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="mb-4">Create New Course</Button>
+        <div className="flex justify-end mb-4">
+          <Button><Plus className="w-4 h-4 mr-2" /> Add Course</Button>
+        </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

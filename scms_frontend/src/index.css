@@ -49,6 +49,13 @@
     --sidebar-accent-foreground: 240 6% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217 92% 60%;
+
+    /* Event colors */
+    --event-blue: 221 83% 53%;
+    --event-red: 0 84% 60%;
+    --event-amber: 38 92% 50%;
+    --event-purple: 265 83% 57%;
+    --event-teal: 173 80% 40%;
   }
 
   .dark {
@@ -88,6 +95,13 @@
     --sidebar-accent-foreground: 240 5% 96%;
     --sidebar-border: 240 4% 16%;
     --sidebar-ring: 217 91% 60%;
+
+    /* Event colors */
+    --event-blue: 221 83% 53%;
+    --event-red: 0 84% 60%;
+    --event-amber: 38 92% 50%;
+    --event-purple: 265 83% 57%;
+    --event-teal: 173 80% 40%;
   }
 }
 
@@ -209,6 +223,185 @@
     @apply bg-primary text-primary-foreground hover:bg-primary/90;
   }
 
+  /* Calendar specific styles */
+  .calendar-container {
+    @apply bg-card rounded-lg border border-border shadow-sm overflow-hidden;
+  }
+  
+  .calendar-header {
+    @apply flex items-center justify-between p-4 border-b border-border;
+  }
+  
+  .calendar-grid {
+    @apply grid grid-cols-7 border-b border-border;
+  }
+  
+  .calendar-day {
+    @apply relative p-2 min-h-[100px] border-r border-t border-border last:border-r-0;
+  }
+  
+  .calendar-day-header {
+    @apply text-center p-2 font-medium border-r border-border last:border-r-0;
+  }
+  
+  .calendar-day-number {
+    @apply text-sm font-medium mb-2;
+  }
+  
+  .calendar-event {
+    @apply text-xs rounded-md p-1.5 mb-1 truncate cursor-pointer transition-all duration-200;
+  }
+  
+  .calendar-event:hover {
+    @apply shadow-md scale-[1.02] -translate-y-0.5;
+  }
+
+  .calendar-event-dot {
+    @apply w-2 h-2 rounded-full inline-block mr-1.5;
+  }
+
+  .semester-container {
+    @apply border border-border rounded-xl mb-10 overflow-hidden animate-fade-in;
+  }
+  
+  .semester-header {
+    @apply bg-secondary p-4 flex justify-between items-center;
+  }
+  
+  .semester-title {
+    @apply text-xl font-semibold;
+  }
+  
+  .module-container {
+    @apply p-4 bg-card rounded-b-xl;
+  }
+  
+  .module-card {
+    @apply bg-white border border-border rounded-lg p-4 mb-3 transition-all duration-300 hover:shadow-md;
+  }
+  
+  .module-header {
+    @apply flex justify-between items-center mb-1;
+  }
+  
+  .module-title {
+    @apply font-medium;
+  }
+  
+  .module-tag {
+    @apply text-xs px-2 py-0.5 rounded-full;
+  }
+  
+  .module-tag-mandatory {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .module-tag-optional {
+    @apply bg-gray-100 text-gray-800;
+  }
+  
+  .module-details {
+    @apply text-sm text-muted-foreground;
+  }
+  
+  .empty-state {
+    @apply flex flex-col items-center justify-center p-8 text-center border border-dashed border-border rounded-xl bg-muted/50;
+  }
+  
+  .empty-state-icon {
+    @apply mb-4 text-muted-foreground;
+  }
+  
+  .empty-state-text {
+    @apply text-muted-foreground mb-4;
+  }
+
+}
+
+/* Smooth animations */
+.fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Calendar animation effects */
+.calendar-fade-in {
+  animation: calendarFadeIn 0.3s ease-out forwards;
+}
+
+.calendar-fade-out {
+  animation: calendarFadeOut 0.2s ease-in forwards;
+}
+
+.calendar-slide-in {
+  animation: calendarSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.calendar-slide-out {
+  animation: calendarSlideOut 0.2s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+.calendar-scale-in {
+  animation: calendarScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes calendarFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes calendarFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes calendarSlideIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes calendarSlideOut {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(10px); opacity: 0; }
+}
+
+@keyframes calendarScaleIn {
+  from { transform: scale(0.97); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 #root {

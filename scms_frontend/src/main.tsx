@@ -13,6 +13,8 @@ import Permissions from "./pages/permissions/Permissions.tsx";
 import Resources from "./pages/resources/Resources.tsx";
 import Courses from "./pages/courses/Course.tsx";
 import Reservation from "./pages/reservation/Reservation.tsx";
+import Calendar from "./pages/Calendar/Calendar.tsx";
+import ManageCourse from "./pages/courses/ManageCourse.tsx";
 import Chat from "./pages/chat/Chat.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import ProtectedRoute from "./context/ProtectedRoute.tsx";
@@ -33,6 +35,42 @@ const router = createBrowserRouter([
           {
             element: <MainLayout />,
             children: [
+              {
+                path: "/",
+                element: <Dashboard />,
+              },
+              {
+                path: "/users",
+                element: <Users />,
+              },
+              {
+                path: "/events",
+                element: <div>Events (TBD)</div>,
+              },
+              {
+                path: "/permissions",
+                element: <Permissions />,
+              },
+              {
+                path: "/calendar",
+                element: <Calendar />,
+              },
+              {
+                path: "/resources",
+                element: <Resources />,
+              },
+              {
+                path: "/reservation",
+                element: <Reservation />,
+              },
+              {
+                path: "/courses",
+                element: <Courses />,
+              },
+              {
+                path: "/courses/manage/:courseId",
+                element: <ManageCourse />,
+              },
               { path: "/", element: <Dashboard /> },
               { path: "/users", element: <Users /> },
               { path: "/events", element: <div>Events (TBD)</div> },
