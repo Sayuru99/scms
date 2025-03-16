@@ -190,10 +190,6 @@ const CourseBuilder: React.FC = () => {
       </div>
       
       <div className="mt-12 flex justify-end space-x-4">
-        <Button variant="outline" onClick={handleSaveDraft}>
-          <Save size={16} className="mr-2" />
-          Save as Draft
-        </Button>
         <Button onClick={handlePublishCourse}>
           <SendHorizontal size={16} className="mr-2" />
           Publish Course
