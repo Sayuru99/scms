@@ -1,21 +1,34 @@
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
 import { courseService } from "@/lib/api";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 interface CreateCourseDialogProps {
   newCourse: { code: string; name: string; description: string; credits: string };
-  setNewCourse: (course: { code: string; name: string; description: string; credits: string }) => void;
+  setNewCourse: React.Dispatch<
+    React.SetStateAction<{ code: string; name: string; description: string; credits: string }>
+  >;
   onCreate: () => void;
 }
 
-export default function CreateCourseDialog({ newCourse, setNewCourse, onCreate }: CreateCourseDialogProps) {
-  const handleCreateCourse = async (e: React.FormEvent) => {
+export default function CreateCourseDialog({
+  newCourse,
+  setNewCourse,
+  onCreate,
+}: CreateCourseDialogProps) {
+  const [open, setOpen] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = Cookies.get("accessToken");
     if (!token) return;
@@ -25,14 +38,15 @@ export default function CreateCourseDialog({ newCourse, setNewCourse, onCreate }
         {
           code: newCourse.code,
           name: newCourse.name,
-          description: newCourse.description || undefined,
+          description: newCourse.description,
           credits: parseInt(newCourse.credits),
         },
         token
       );
-      setNewCourse({ code: "", name: "", description: "", credits: "" });
-      onCreate();
       toast.success("Course created successfully");
+      setNewCourse({ code: "", name: "", description: "", credits: "" });
+      setOpen(false);
+      onCreate();
     } catch (err) {
       console.error("Failed to create course:", err);
       toast.error("Failed to create course");
@@ -40,15 +54,15 @@ export default function CreateCourseDialog({ newCourse, setNewCourse, onCreate }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="mb-4"><Plus className="w-4 h-4 mr-2" /> Add Course</Button>
+        <Button className="mb-4">Create New Course</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Course</DialogTitle>
+          <DialogTitle>Create Course</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleCreateCourse} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="code">Code</Label>
             <Input
@@ -72,7 +86,9 @@ export default function CreateCourseDialog({ newCourse, setNewCourse, onCreate }
             <Input
               id="description"
               value={newCourse.description}
-              onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+              onChange={(e) =>
+                setNewCourse({ ...newCourse, description: e.target.value })
+              }
             />
           </div>
           <div>

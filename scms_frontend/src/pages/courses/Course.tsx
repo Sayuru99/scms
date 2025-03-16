@@ -1,48 +1,50 @@
-
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
 import { courseService } from "../../lib/api";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
 import EnrolledCoursesTable from "./components/EnrolledCoursesTable";
 import AvailableCoursesTable from "./components/AvailableCoursesTable";
 import UpcomingExamsTable from "./components/UpcomingExamsTable";
 import CreateCourseDialog from "./components/CreateCourseDialog";
 import EditCourseDialog from "./components/EditCourseDialog";
 
-interface JwtPayload {
-  userId: string;
-  role: string;
-  permissions: string[];
-  exp: number;
+interface Course {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+  credits: number;
+}
+
+interface Exam {
+  id: number;
+  name: string;
+  date: string;
+  course: string;
 }
 
 function Courses() {
-  const [permissions, setPermissions] = useState<string[]>([]);
-  const [, setRole] = useState<string>("");
-  const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
-  const [availableCourses, setAvailableCourses] = useState<any[]>([]);
-  const [upcomingExams, setUpcomingExams] = useState<any[]>([]);
-  const [newCourse, setNewCourse] = useState({ code: "", name: "", description: "", credits: "" });
-  const [editCourse, setEditCourse] = useState<any | null>(null);
+  const { userId, permissions } = useAuth();
+  const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
+  const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
+  const [upcomingExams, setUpcomingExams] = useState<Exam[]>([]);
+  const [newCourse, setNewCourse] = useState({
+    code: "",
+    name: "",
+    description: "",
+    credits: "",
+  });
+  const [editCourse, setEditCourse] = useState<Course | null>(null);
 
   useEffect(() => {
-    const accessToken = Cookies.get("accessToken");
-    if (accessToken) {
-      try {
-        const decoded: JwtPayload = jwtDecode(accessToken);
-        setPermissions(decoded.permissions || []);
-        setRole(decoded.role);
-        if (decoded.permissions.includes("read:courses")) {
-          fetchEnrolledCourses(accessToken);
-          fetchAvailableCourses(accessToken);
-          fetchUpcomingExams();
-        }
-      } catch (err) {
-        console.error("Failed to decode token:", err);
-      }
+    const token = Cookies.get("accessToken");
+    if (token && userId && permissions.includes("read:courses")) {
+      fetchEnrolledCourses(token);
+      fetchAvailableCourses(token);
+      fetchUpcomingExams();
     }
-  }, []);
+  }, [userId, permissions]);
 
   const fetchEnrolledCourses = async (token: string) => {
     try {
@@ -92,7 +94,7 @@ function Courses() {
     if (!token) return;
 
     try {
-      await courseService.deleteCourse(courseId, token); 
+      await courseService.deleteCourse(courseId, token);
       fetchEnrolledCourses(token);
       fetchAvailableCourses(token);
       toast.success("Course deleted successfully");
@@ -113,32 +115,34 @@ function Courses() {
               newCourse={newCourse}
               setNewCourse={setNewCourse}
               onCreate={() => {
-                fetchEnrolledCourses(Cookies.get("accessToken") || "");
-                fetchAvailableCourses(Cookies.get("accessToken") || "");
+                const token = Cookies.get("accessToken") || "";
+                fetchEnrolledCourses(token);
+                fetchAvailableCourses(token);
               }}
             />
           )}
 
-          {/* <EnrolledCoursesTable
+          <EnrolledCoursesTable
             courses={enrolledCourses}
             permissions={permissions}
             onEditCourse={setEditCourse}
             onDeleteCourse={handleDeleteCourse}
-          /> */}
+          />
           <AvailableCoursesTable
             courses={availableCourses}
             permissions={permissions}
             onEnroll={handleEnroll}
           />
-          {/* <UpcomingExamsTable exams={upcomingExams} /> */}
+          <UpcomingExamsTable exams={upcomingExams} />
 
           {editCourse && (
             <EditCourseDialog
               editCourse={editCourse}
               setEditCourse={setEditCourse}
               onUpdate={() => {
-                fetchEnrolledCourses(Cookies.get("accessToken") || "");
-                fetchAvailableCourses(Cookies.get("accessToken") || "");
+                const token = Cookies.get("accessToken") || "";
+                fetchEnrolledCourses(token);
+                fetchAvailableCourses(token);
               }}
             />
           )}

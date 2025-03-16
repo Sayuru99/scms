@@ -1,4 +1,5 @@
 import { toast } from "react-toastify";
+import { io, Socket } from "socket.io-client";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7200";
 
@@ -413,7 +414,7 @@ export const courseService = {
     ),
 
   updateCourse: (
-    courseId: string,
+    courseId: number,
     data: { code: string; name: string; description?: string; credits: number },
     token: string
   ) =>
@@ -425,7 +426,7 @@ export const courseService = {
       true
     ),
 
-  deleteCourse: (courseId: string, token: string) =>
+  deleteCourse: (courseId: number, token: string) =>
     apiRequest<{ message: string; courseId: number }>(
       `/api/courses/${courseId}`,
       "DELETE",
@@ -433,6 +434,38 @@ export const courseService = {
       token,
       true
     ),
+};
+
+export const chatService = {
+  getMessages: (recipientId: string, token: string) =>
+    apiRequest<any[]>(
+      `/api/chat/messages/${recipientId}`,
+      "GET",
+      undefined,
+      token
+    ),
+
+  getGroupMessages: (groupId: number, token: string) =>
+    apiRequest<any[]>(
+      `/api/chat/group-messages/${groupId}`,
+      "GET",
+      undefined,
+      token
+    ),
+
+  getGroups: (token: string) =>
+    apiRequest<any[]>("/api/chat/groups", "GET", undefined, token),
+
+  initializeSocket: (token: string): Socket => {
+    const socket = io(BASE_URL, {
+      auth: { token },
+      transports: ["websocket"],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+    return socket;
+  },
 };
 
 export interface User {
@@ -446,15 +479,6 @@ export interface User {
   isActive: boolean;
   isFirstLogin: boolean;
   isDeleted: boolean;
-}
-
-export interface Course {
-  id: string;
-  code: string;
-  name: string;
-  credits: number;
-  description: string;
-  // isDeleted: boolean;
 }
 
 export interface CreateUserData {
