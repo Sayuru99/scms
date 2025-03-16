@@ -20,16 +20,6 @@ export default function ResourceCards({ resources, reservations, totalResources 
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Pending Requests</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-2xl font-bold">
-            {reservations.filter((r) => r.status === "Requested").length}
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
           <CardTitle>Reserved Resources</CardTitle>
         </CardHeader>
         <CardContent>
