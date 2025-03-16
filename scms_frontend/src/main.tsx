@@ -16,6 +16,7 @@ import Resources from "./pages/resources/Resources.tsx";
 import Courses from "./pages/courses/Course.tsx"; 
 import Reservation from "./pages/reservation/Reservation.tsx";
 import Calendar from "./pages/Calendar/Calendar.tsx";
+import ManageCourse from "./pages/courses/ManageCourse.tsx";
 
 const router = createBrowserRouter([
   {
@@ -67,7 +68,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "/courses/manage/:courseId",
-                element: <div>Manage Course (TBD)</div>,
+                element: <ManageCourse />,
               },
             ],
           },
