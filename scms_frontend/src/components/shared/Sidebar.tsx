@@ -1,7 +1,7 @@
-// src/components/shared/Sidebar.tsx
+
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn, FaLock, FaComments } from "react-icons/fa"; // Add FaComments
+import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaBullhorn, FaLock, FaComments } from "react-icons/fa"; 
 import { Album, BookOpen, Briefcase } from "lucide-react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -38,7 +38,7 @@ const Sidebar = () => {
     { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" },
     { name: "Reservation", path: "/reservation", icon: <Album className="w-5 h-5" />, requiredPermission: "reserve:resources" },
     { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
-    { name: "Chat", path: "/chat", icon: <FaComments className="w-5 h-5" />, requiredPermission: "read:messages" }, // Added Chat
+    { name: "Chat", path: "/chat", icon: <FaComments className="w-5 h-5" />, requiredPermission: "read:messages" }, 
   ];
 
   const filteredMenuItems = menuItems.filter((item) =>
