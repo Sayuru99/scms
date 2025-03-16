@@ -16,7 +16,7 @@ const ResourceGrid: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Sample data
+  
   const resources: Resource[] = [
     {
       id: '1',
@@ -45,12 +45,10 @@ const ResourceGrid: React.FC = () => {
   ];
 
   const handleReserve = (resource: Resource) => {
-    toast.success(`Reserved ${resource.title}`, {
-      description: 'Your reservation has been confirmed.',
-    });
+    toast.success(`Reserved ${resource.title}`);
   };
 
-  // Filter and search resources
+  
   const filteredResources = resources.filter((resource) => {
     const matchesFilter = filter === 'All' || resource.type === filter;
     const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
