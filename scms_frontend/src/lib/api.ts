@@ -304,6 +304,25 @@ export const resourceService = {
       true
     ),
 
+
+    // new reservation
+    getReservationsByID: (
+      token: string,
+      page: number = 1,
+      limit: number = 5
+    ) =>
+      apiRequest<{
+        reservations: Reservation[];
+        total: number;
+        page: number;
+        limit: number;
+      }>(
+        `/api/resources/reservations/user/?page=${page}&limit=${limit}`,
+        "GET",
+        undefined,
+        token
+      ),
+
   getReservations: (
     token: string,
     page: number = 1,

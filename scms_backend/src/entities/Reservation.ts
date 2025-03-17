@@ -26,13 +26,6 @@ export class Reservation {
   @Column({ type: "datetime" })
   endTime!: Date;
 
-  @Column({
-    type: "enum",
-    enum: ["Pending", "Approved", "Rejected", "Cancelled"],
-    default: "Pending",
-  })
-  status!: string;
-
   @Column({ type: "text", nullable: true })
   purpose?: string;
 

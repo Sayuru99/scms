@@ -34,6 +34,7 @@ interface ReservationFilterParams {
   page?: number;
   limit?: number;
   status?: "Requested" | "Approved" | "Rejected" | "Returned";
+  userId?: string;
 }
 
 export class ResourceService {
@@ -156,6 +157,23 @@ export class ResourceService {
     return types;
   }
 
+  async getReservations(filters: ReservationFilterParams = {}) {
+    const { page = 1, limit = 10, status, userId } = filters;
+    const query: FindManyOptions<Reservation> = {
+      where: { isDeleted: false },
+      relations: ["user", "resource", "approvedBy"],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: "DESC" },
+    };
+
+    if (userId) query.where = { ...query.where, user: { id: userId } };
+
+    const [reservations, total] = await this.reservationRepo.findAndCount(query);
+    logger.info(`Fetched ${reservations.length} reservations (page ${page}, limit ${limit})`);
+    return { reservations, total, page, limit };
+  }
+
   async updateResourceType(typeId: number, type: string) {
     const resourceType = await this.resourceTypeRepo.findOneBy({
       id: typeId,
@@ -208,8 +226,6 @@ export class ResourceService {
       isDeleted: false,
     });
     if (!resource) throw new NotFoundError("Resource not found");
-    if (resource.status !== "Available" && (!params.status || params.status === "Requested"))
-      throw new BadRequestError("Resource is not available");
 
     const startTime = new Date(params.startTime);
     const endTime = new Date(params.endTime);
@@ -218,7 +234,6 @@ export class ResourceService {
     const overlappingReservations = await this.reservationRepo.find({
       where: {
         resource: { id: params.resourceId },
-        status: "Approved",
         isDeleted: false,
         startTime: LessThanOrEqual(endTime),
         endTime: MoreThanOrEqual(startTime),
@@ -235,30 +250,12 @@ export class ResourceService {
       startTime,
       endTime,
       purpose: params.purpose,
-      status: params.status || "Requested",
       isDeleted: false,
     });
 
     await this.reservationRepo.save(reservation);
     logger.info(`Reservation created: ${reservation.id}`);
     return reservation;
-  }
-
-  async getReservations(filters: ReservationFilterParams = {}) {
-    const { page = 1, limit = 10, status } = filters;
-    const query: FindManyOptions<Reservation> = {
-      where: { isDeleted: false },
-      relations: ["user", "resource", "approvedBy"],
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { createdAt: "DESC" },
-    };
-
-    if (status) query.where = { ...query.where, status };
-
-    const [reservations, total] = await this.reservationRepo.findAndCount(query);
-    logger.info(`Fetched ${reservations.length} reservations (page ${page}, limit ${limit})`);
-    return { reservations, total, page, limit };
   }
 
   async updateReservation(reservationId: number, updates: { status: "Approved" | "Rejected" | "Returned" }, approvedById?: string) {
@@ -280,11 +277,10 @@ export class ResourceService {
       reservation.approvedBy = approvedBy;
     }
 
-    reservation.status = updates.status;
     if (updates.status === "Approved") {
       reservation.resource.status = "Reserved";
     } else if (updates.status === "Rejected" || updates.status === "Returned") {
-      reservation.resource.status = "Available";
+      reservation.resource.status = "Available"; 
     }
 
     await this.resourceRepo.save(reservation.resource);
@@ -293,7 +289,6 @@ export class ResourceService {
     return reservation;
   }
 
-  
   async getResourceById(resourceId: number) {
     const resource = await this.resourceRepo.findOne({
       where: { id: resourceId, isDeleted: false },
@@ -323,15 +318,13 @@ export class ResourceService {
       where: {
         resource: { id: resourceId },
         user: { id: userId },
-        status: "Approved",
         isDeleted: false,
       },
       relations: ["resource", "user"],
     });
-    return reservation; 
+    return reservation;
   }
 
-  
   async requestResource(resourceId: number, params: Omit<ReservationCreateParams, "resourceId" | "status">) {
     const resource = await this.getResourceById(resourceId);
     if (resource.status !== "Available") {
@@ -353,16 +346,6 @@ export class ResourceService {
 
   async returnResource(resourceId: number, userId: string) {
     const reservation = await this.getActiveReservation(resourceId, userId);
-    if (!reservation || reservation.status !== "Approved") {
-      logger.warn(`No active approved reservation found for resource ${resourceId} and user ${userId}`);
-      throw new BadRequestError("No active approved reservation found");
-    }
-
-    reservation.status = "Returned";
-    reservation.resource.status = "Available";
-    await this.resourceRepo.save(reservation.resource);
-    await this.reservationRepo.save(reservation);
-    logger.info(`Resource returned: ${resourceId} - Reservation: ${reservation.id}`);
     return reservation;
   }
 }

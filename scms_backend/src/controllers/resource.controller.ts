@@ -100,7 +100,7 @@ export class ResourceController {
         userId: req.user!.userId,
         ...req.body,
       });
-      res.status(201).json({ message: "Reservation requested", reservation });
+      res.status(201).json({ message: "Reservation created!", reservation });
     } catch (error) {
       next(error);
     }
@@ -159,6 +159,22 @@ export class ResourceController {
 
       const reservation = await this.resourceService.updateReservation(reservationId, { status }, approvedById);
       res.json({ message: `Reservation ${status.toLowerCase()} successfully`, reservation });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getReservationsByUserId(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.userId;
+      const { page, limit, status } = req.query;
+      const reservations = await this.resourceService.getReservations({
+        page: page ? parseInt(page as string) : undefined,
+        limit: limit ? parseInt(limit as string) : undefined,
+        status: status as "Requested" | "Approved" | "Rejected" | "Returned" | undefined,
+        userId
+      });
+      res.json(reservations);
     } catch (error) {
       next(error);
     }

@@ -47,8 +47,9 @@ router.delete(
   resourceController.deleteResourceType.bind(resourceController)
 );
 
+// Reservation routes
 router.post(
-  "/reservations",
+  "/reservations/create",
   authMiddleware("create:reservations"),
   resourceController.createReservation.bind(resourceController)
 );
@@ -57,6 +58,14 @@ router.get(
   authMiddleware("read:reservations"),
   resourceController.getReservations.bind(resourceController)
 );
+router.get(
+  "/reservations/user/",
+  authMiddleware("create:reservations"),
+  resourceController.getReservationsByUserId.bind(resourceController)
+);
+
+
+// OLD Reservation routes
 router.put(
   "/reservations/:reservationId",
   authMiddleware("update:reservations"),
