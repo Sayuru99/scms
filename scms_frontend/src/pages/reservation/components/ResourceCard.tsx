@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 
 interface ResourceCardProps {
-  type: 'Lecture Hall' | 'Equipment' | 'Labs';
+  type: string;
   title: string;
   description: string;
   onReserve: () => void;
@@ -10,12 +10,12 @@ interface ResourceCardProps {
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ type, title, description, onReserve }) => {
   const getTagColor = () => {
-    switch (type) {
-      case 'Lecture Hall':
+    switch (type.toLowerCase()) {
+      case 'lecture hall':
         return 'bg-blue-100 text-blue-800';
-      case 'Equipment':
+      case 'equipment':
         return 'bg-amber-100 text-amber-800';
-      case 'Labs':
+      case 'labs':
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
