@@ -68,22 +68,17 @@ const router = createBrowserRouter([
                 element: <Courses />,
               },
               {
-                path: "/courses/manage/",
+                path: "/courses/manage",
                 element: <ManageCourse />,
               },
               {
                 path: "/courses/manage/:courseId",
                 element: <ManageCourse />,
               },
-              { path: "/", element: <Dashboard /> },
-              { path: "/users", element: <Users /> },
-              { path: "/events", element: <div>Events (TBD)</div> },
-              { path: "/permissions", element: <Permissions /> },
-              { path: "/calendar", element: <div>Calendar (TBD)</div> },
-              { path: "/resources", element: <Resources /> },
-              { path: "/reservation", element: <Reservation /> },
-              { path: "/courses", element: <Courses /> },
-              { path: "/chat", element: <Chat /> },
+              {
+                path: "/chat",
+                element: <Chat />,
+              },
             ],
           },
         ],
@@ -98,7 +93,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <AuthProvider>
       <RouterProvider router={router} />
       <ToastContainer
-        position="top-right"
+        position="bottom-right"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={true}

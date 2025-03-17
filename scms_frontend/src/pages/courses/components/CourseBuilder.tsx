@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, SendHorizontal, Pencil } from 'lucide-react';
+import { PlusCircle, SendHorizontal } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -304,7 +304,7 @@ const CourseBuilder: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl ml-3.5 fade-in text-left">
+    <div className="w-full max-w-4xl fade-in text-left">
       <h1 className="text-3xl font-bold mb-8">{courseId ? 'Edit Course' : 'Create Course'}</h1>
       
       {isLoading ? (

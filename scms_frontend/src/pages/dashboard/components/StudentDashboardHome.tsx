@@ -4,122 +4,27 @@ import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
 import StudentCourseCard from "./StudentCourseCard";
 import { courseService } from "../../../lib/api";
-import { AnimatePresence } from "framer-motion";
-import { Separator } from "@/components/ui/separator";
 import ModuleSelection, { SemesterData } from "./ModuleSelection";
 
 interface Course {
-  id: string;
+  id: number;
   name: string;
   credits: number;
+  modules?: Array<{
+    id: number;
+    name: string;
+    code?: string;
+    credits?: number;
+    semester: string;
+    isMandatory: boolean;
+    lecturer?: { id: string };
+  }>;
 }
 
-const exampleSemesters: SemesterData[] = [
-  {
-    id: "semester1",
-    name: "Semester 1",
-    modules: [
-      {
-        id: "module1",
-        title: "Software Development Practice",
-        credits: 30,
-        schedule: "Mon, Wed (9:00 AM - 11:00 AM)",
-        actionType: "view",
-      },
-      {
-        id: "module2",
-        title: "Individual Project",
-        credits: 50,
-        schedule: "Tue, Thu (2:00 PM - 4:00 PM)",
-        actionType: "register",
-      },
-      {
-        id: "module3",
-        title: "Advanced Programming",
-        credits: 20,
-        schedule: "Wed, Fri (1:00 PM - 3:00 PM)",
-        actionType: "register",
-      },
-    ],
-  },
-  {
-    id: "semester2",
-    name: "Semester 2",
-    modules: [
-      {
-        id: "module4",
-        title: "Web Application Development",
-        credits: 25,
-        schedule: "Mon, Thu (10:00 AM - 12:00 PM)",
-        actionType: "view",
-      },
-      {
-        id: "module5",
-        title: "Database Systems",
-        credits: 20,
-        schedule: "Tue, Fri (9:00 AM - 11:00 AM)",
-        actionType: "register",
-      },
-    ],
-  },
-  {
-    id: "semester3",
-    name: "Semester 3",
-    modules: [
-      {
-        id: "module6",
-        title: "Artificial Intelligence",
-        credits: 30,
-        schedule: "Mon, Wed (1:00 PM - 3:00 PM)",
-        actionType: "view",
-      },
-      {
-        id: "module7",
-        title: "Mobile Application Development",
-        credits: 25,
-        schedule: "Tue, Thu (10:00 AM - 12:00 PM)",
-        actionType: "register",
-      },
-    ],
-  },
-  {
-    id: "semester4",
-    name: "Semester 4",
-    modules: [
-      {
-        id: "module8",
-        title: "Final Year Project",
-        credits: 60,
-        schedule: "Mon, Wed, Fri (1:00 PM - 3:00 PM)",
-        actionType: "view",
-      },
-      {
-        id: "module9",
-        title: "Machine Learning",
-        credits: 30,
-        schedule: "Tue, Thu (9:00 AM - 11:00 AM)",
-        actionType: "register",
-      },
-    ],
-  },
-];
-
-export interface StudentDashboardHomeProps {
-  title?: string;
-  subtitle?: string;
-}
-interface JwtPayload {
-  userId: string;
-  role: string;
-  permissions: string[];
-  exp: number;
-}
-
-const StudentDashboardHome: React.FC<StudentDashboardHomeProps> = () => {
-  const [permissions, setPermissions] = useState<string[]>([]);
+const StudentDashboardHome: React.FC = () => {
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -127,9 +32,7 @@ const StudentDashboardHome: React.FC<StudentDashboardHomeProps> = () => {
     const accessToken = Cookies.get("accessToken");
     if (accessToken) {
       try {
-        const decoded: JwtPayload = jwtDecode(accessToken);
-        // console.log(decoded.permissions);
-        setPermissions(decoded.permissions || []);
+        jwtDecode(accessToken);
         fetchCourses(accessToken);
       } catch (err) {
         console.error("Failed to decode token:", err);
@@ -138,23 +41,64 @@ const StudentDashboardHome: React.FC<StudentDashboardHomeProps> = () => {
   }, []);
 
   const fetchCourses = async (token: string) => {
-      setLoading(true);
-      try {
-        const fetchedCourses = await courseService.getEnrolledCourses(token);
-        setCourses(fetchedCourses.courses);
-        setFilteredCourses(fetchedCourses.courses);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-        setError("Failed to load users");
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    try {
+      const fetchedCourses = await courseService.getEnrolledCourses(token);
+      setCourses(fetchedCourses.courses);
+      setFilteredCourses(fetchedCourses.courses);
+    } catch (err) {
+      console.error("Failed to fetch courses:", err);
+      setError("Failed to load courses");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCourseClick = async (courseId: number) => {
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return;
+
+    if (courseId === selectedCourse?.id) {
+      setSelectedCourse(null);
+      return;
+    }
+
+    const token = Cookies.get("accessToken");
+    if (!token) return;
+
+    try {
+      const courseDetails = await courseService.getCourseById(courseId, token);
+      setSelectedCourse(courseDetails);
+    } catch (err) {
+      console.error("Failed to fetch course details:", err);
+    }
+  };
+
+  const transformCourseToSemesters = (course: Course): SemesterData[] => {
+    if (!course.modules) return [];
+
+    const semesterMap = new Map<string, SemesterData>();
+    
+    course.modules.forEach(module => {
+      if (!semesterMap.has(module.semester)) {
+        semesterMap.set(module.semester, {
+          id: module.semester,
+          name: module.semester,
+          modules: []
+        });
       }
-    };
 
+      const semester = semesterMap.get(module.semester)!;
+      semester.modules.push({
+        id: module.id.toString(),
+        title: module.name,
+        credits: module.credits || 0,
+        schedule: "Schedule TBD", // You might want to add this to your module data
+        actionType: "view"
+      });
+    });
 
-  const handleCourseClick = (courseId: string) => {
-    setSelectedCourse(courseId === selectedCourse ? null : courseId);
-    console.log("Selected Course: "+ courseId);
+    return Array.from(semesterMap.values());
   };
 
   if (loading) {
@@ -180,21 +124,25 @@ const StudentDashboardHome: React.FC<StudentDashboardHomeProps> = () => {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12"
       >
         {filteredCourses.map((course) => (
-          console.log("J : "+ course),
           <StudentCourseCard
-          key={course.id}
-          title={course.name}
-          duration={course.credits.toString()}
-          modules={12}
-          isPrimary={true}
-          onClick={() => handleCourseClick(course.id)}
+            key={course.id}
+            title={course.name}
+            duration={course.credits.toString()}
+            modules={course.modules?.length || 0}
+            isPrimary={true}
+            onClick={() => handleCourseClick(course.id)}
           />
         ))}
       </motion.div>
      
       <div className="container mx-auto p-4">
-      <ModuleSelection title="Module Selection - Bachelor of Computer Science" semesters={exampleSemesters} />
-    </div>
+        {selectedCourse && (
+          <ModuleSelection 
+            title={`Module Selection - ${selectedCourse.name}`} 
+            semesters={transformCourseToSemesters(selectedCourse)} 
+          />
+        )}
+      </div>
     </div>
   );
 };
