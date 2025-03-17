@@ -93,7 +93,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <AuthProvider>
       <RouterProvider router={router} />
       <ToastContainer
-        position="top-right"
+        position="bottom-right"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={true}
