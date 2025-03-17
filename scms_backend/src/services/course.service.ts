@@ -192,7 +192,7 @@ export class CourseService {
   async getAvailableCourses(
     studentId: string,
     page: number = 1,
-    limit: number = 3
+    limit: number = 10
   ) {
     const enrolledCourseIds = (
       await this.enrollmentRepo.find({

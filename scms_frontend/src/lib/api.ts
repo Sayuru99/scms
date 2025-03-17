@@ -383,7 +383,7 @@ export const courseService = {
       true
     ),
 
-  getAvailableCourses: (token: string, page: number = 1, limit: number = 3) =>
+  getAvailableCourses: (token: string, page: number = 1, limit: number = 10) =>
     apiRequest<{ courses: any[]; total: number; page: number; limit: number }>(
       `/api/courses/available?page=${page}&limit=${limit}`,
       "GET",
