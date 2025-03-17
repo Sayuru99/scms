@@ -10,6 +10,9 @@ export class Module {
   @Column({ length: 100 })
   name!: string;
 
+  @Column({ length: 100 })
+  code!: string;
+
   @ManyToOne(() => Course, { nullable: false })
   course!: Course;
 

@@ -68,6 +68,10 @@ const router = createBrowserRouter([
                 element: <Courses />,
               },
               {
+                path: "/courses/manage/",
+                element: <ManageCourse />,
+              },
+              {
                 path: "/courses/manage/:courseId",
                 element: <ManageCourse />,
               },

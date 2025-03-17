@@ -1,5 +1,5 @@
 import React from 'react';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,35 +20,34 @@ export type ModuleType = {
 type ModuleProps = {
   module: ModuleType;
   onDeleteModule: () => void;
+  onEditModule: () => void;
 };
 
-const Module: React.FC<ModuleProps> = ({ module, onDeleteModule }) => {
+const Module: React.FC<ModuleProps> = ({ module, onDeleteModule, onEditModule }) => {
   return (
-    <div className="module-card fade-in-up">
-      <div className="module-header">
-        <h4 className="module-title">{module.title}</h4>
-        <div className="flex items-center space-x-2">
-          <span className={`module-tag ${module.isMandatory ? 'module-tag-mandatory' : 'module-tag-optional'}`}>
-            {module.isMandatory ? 'Mandatory' : 'Optional'}
-          </span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreVertical size={16} />
-                <span className="sr-only">Actions</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem className="text-destructive" onClick={onDeleteModule}>
-                Delete Module
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+    <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+      <div className="flex-1">
+        <h4 className="font-medium">{module.title}</h4>
+        <p className="text-sm text-gray-500">{module.code}</p>
+        <p className="text-sm text-gray-500">{module.credits} credits</p>
+        <p className="text-sm text-gray-500">{module.isMandatory ? 'Mandatory' : 'Optional'}</p>
       </div>
-      <div className="module-details">
-        {module.code} • {module.credits} Credit{module.credits !== 1 ? 's' : ''}
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={onEditModule}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onDeleteModule} className="text-red-600">
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

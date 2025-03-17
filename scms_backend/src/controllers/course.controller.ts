@@ -1,13 +1,23 @@
 import { Request, Response, NextFunction } from "express";
 import { CourseService } from "../services/course.service";
+import { CreateCourseDto, UpdateCourseDto } from "../dtos/course.dto";
+import { validate } from "class-validator";
+import logger from "../config/logger";
 
 export class CourseController {
   private courseService = new CourseService();
 
   async createCourse(req: Request, res: Response, next: NextFunction) {
     try {
+      const dto = Object.assign(new CreateCourseDto(), req.body);
+      const errors = await validate(dto);
+      if (errors.length > 0) {
+        logger.warn(`Validation failed for course creation: ${JSON.stringify(errors)}`);
+        return res.status(400).json({ message: "Validation failed", errors });
+      }
+
       const course = await this.courseService.createCourse({
-        ...req.body,
+        ...dto,
         createdById: req.user!.userId,
       });
       res.status(201).json({ message: "Course created", course });
@@ -33,9 +43,16 @@ export class CourseController {
 
   async updateCourse(req: Request, res: Response, next: NextFunction) {
     try {
+      const dto = Object.assign(new UpdateCourseDto(), req.body);
+      const errors = await validate(dto);
+      if (errors.length > 0) {
+        logger.warn(`Validation failed for course update: ${JSON.stringify(errors)}`);
+        return res.status(400).json({ message: "Validation failed", errors });
+      }
+
       const course = await this.courseService.updateCourse(
         parseInt(req.params.courseId),
-        req.body
+        dto
       );
       res.json({ message: "Course updated", course });
     } catch (error) {
@@ -93,6 +110,16 @@ export class CourseController {
         courseId
       );
       res.status(201).json({ message: "Enrolled successfully", enrollment });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCourseById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const course = await this.courseService.getCourseById(courseId);
+      res.json(course);
     } catch (error) {
       next(error);
     }

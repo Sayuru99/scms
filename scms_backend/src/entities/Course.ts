@@ -5,8 +5,10 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from "typeorm";
 import { User } from "./User";
+import { Module } from "./Module";
 
 @Entity("courses")
 export class Course {
@@ -27,6 +29,9 @@ export class Course {
 
   @ManyToOne(() => User, { nullable: false })
   createdBy!: User;
+
+  @OneToMany(() => Module, (module) => module.course)
+  modules!: Module[];
 
   @Column({ name: "is_deleted", default: false })
   isDeleted!: boolean;
