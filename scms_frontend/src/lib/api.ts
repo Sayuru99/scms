@@ -392,6 +392,40 @@ export const resourceService = {
     ),
 };
 
+export interface Course {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+  credits: number;
+  modules: {
+    id: number;
+    name: string;
+    code?: string;
+    semester: string;
+    credits: number;
+    isMandatory: boolean;
+    lecturer?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    };
+  }[];
+}
+
+export interface CourseData {
+  name: string;
+  code: string;
+  description?: string;
+  credits: number;
+  modules: {
+    name: string;
+    semester: string;
+    credits: number;
+    isMandatory: boolean;
+  }[];
+}
+
 export const courseService = {
   getEnrolledCourses: (token: string, page: number = 1, limit: number = 10) =>
     apiRequest<{ courses: any[]; total: number; page: number; limit: number }>(
@@ -420,27 +454,38 @@ export const courseService = {
       true
     ),
 
-  createCourse: (
-    data: { code: string; name: string; description?: string; credits: number },
-    token: string
-  ) =>
-    apiRequest<{ message: string; course: any }>(
-      `/api/courses`,
-      "POST",
-      data,
+  createCourse: (courseData: CourseData, token: string) =>
+    apiRequest<{ message: string; course: Course }>(
+      '/api/courses',
+      'POST',
+      courseData,
       token,
       true
     ),
 
-  updateCourse: (
-    courseId: number,
-    data: { code: string; name: string; description?: string; credits: number },
-    token: string
-  ) =>
-    apiRequest<{ message: string; course: any }>(
+  getCourseById: (courseId: number, token: string) =>
+    apiRequest<Course>(
       `/api/courses/${courseId}`,
-      "PUT",
-      data,
+      'GET',
+      undefined,
+      token,
+      true
+    ),
+
+  getCourses: (token: string, params?: { page?: number; limit?: number; code?: string; name?: string }) =>
+    apiRequest<{ courses: Course[]; total: number; page: number; limit: number }>(
+      `/api/courses${params ? `?${new URLSearchParams(params as any).toString()}` : ''}`,
+      'GET',
+      undefined,
+      token,
+      true
+    ),
+
+  updateCourse: (courseId: number, courseData: CourseData, token: string) =>
+    apiRequest<{ message: string; course: Course }>(
+      `/api/courses/${courseId}`,
+      'PUT',
+      courseData,
       token,
       true
     ),

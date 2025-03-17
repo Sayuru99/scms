@@ -1,4 +1,6 @@
 import { toast } from "react-toastify";
+import { apiRequest } from './apiRequest';
+import { Course, CourseData } from '../types/course';
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7200";
 
@@ -59,14 +61,6 @@ export interface ModuleData {
   lecturerId?: string;
 }
 
-export interface CourseData {
-  code: string;
-  name: string;
-  description?: string;
-  credits: number;
-  modules?: ModuleData[];
-}
-
 export interface Course {
   id: number;
   code: string;
@@ -105,15 +99,25 @@ export const courseService = {
       true
     ),
 
-  getCourses: (token: string, params?: { page?: number; limit?: number; code?: string; name?: string }) =>
-    apiRequest<{ courses: Course[]; total: number; page: number; limit: number }>(
-      '/api/courses',
+  getCourseById: (courseId: number, token: string) =>
+    apiRequest<Course>(
+      `/api/courses/${courseId}`,
       'GET',
-      params,
-      token
+      undefined,
+      token,
+      true
     ),
 
-  updateCourse: (courseId: number, courseData: Partial<CourseData>, token: string) =>
+  getCourses: (token: string, params?: { page?: number; limit?: number; code?: string; name?: string }) =>
+    apiRequest<{ courses: Course[]; total: number; page: number; limit: number }>(
+      `/api/courses${params ? `?${new URLSearchParams(params as any).toString()}` : ''}`,
+      'GET',
+      undefined,
+      token,
+      true
+    ),
+
+  updateCourse: (courseId: number, courseData: CourseData, token: string) =>
     apiRequest<{ message: string; course: Course }>(
       `/api/courses/${courseId}`,
       'PUT',

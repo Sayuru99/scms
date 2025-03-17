@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlusCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { PlusCircle, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import Module, { ModuleType } from './Module';
 import EmptyState from './EmptyState';
@@ -11,6 +11,8 @@ type SemesterProps = {
   onAddModule: () => void;
   onDeleteModule: (moduleId: string) => void;
   onDeleteSemester: () => void;
+  onEditModule: (module: ModuleType) => void;
+  onEditSemester: () => void;
 };
 
 const Semester: React.FC<SemesterProps> = ({ 
@@ -20,6 +22,8 @@ const Semester: React.FC<SemesterProps> = ({
   onAddModule,
   onDeleteModule,
   onDeleteSemester,
+  onEditModule,
+  onEditSemester,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -38,6 +42,15 @@ const Semester: React.FC<SemesterProps> = ({
           <h3 className="semester-title">{name}</h3>
         </div>
         <div className="flex items-center space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-xs h-8 px-3"
+            onClick={onEditSemester}
+          >
+            <Pencil size={14} className="mr-1" />
+            Edit
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
@@ -66,6 +79,7 @@ const Semester: React.FC<SemesterProps> = ({
                   key={module.id} 
                   module={module} 
                   onDeleteModule={() => onDeleteModule(module.id)}
+                  onEditModule={() => onEditModule(module)}
                 />
               ))}
             </div>

@@ -15,6 +15,7 @@ interface CourseCreateParams {
   createdById: string;
   modules?: {
     name: string;
+    code: string;
     semester: string;
     credits?: number;
     isMandatory: boolean;
@@ -77,6 +78,7 @@ export class CourseService {
 
           const moduleEntity = this.moduleRepo.create({
             name: moduleData.name,
+            code: moduleData.code,
             semester: moduleData.semester,
             credits: moduleData.credits,
             isMandatory: moduleData.isMandatory,
@@ -124,34 +126,84 @@ export class CourseService {
   async updateCourse(courseId: number, updates: Partial<CourseCreateParams>) {
     const course = await this.courseRepo.findOne({
       where: { id: courseId, isDeleted: false },
+      relations: ["modules"],
     });
     if (!course) {
       logger.warn(`Course not found: ${courseId}`);
       throw new NotFoundError("Course not found");
     }
 
-    if (updates.createdById) {
-      const createdBy = await this.userRepo.findOneBy({
-        id: updates.createdById,
-        isDeleted: false,
+    // Start a transaction to ensure data consistency
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      if (updates.createdById) {
+        const createdBy = await this.userRepo.findOneBy({
+          id: updates.createdById,
+          isDeleted: false,
+        });
+        if (!createdBy) throw new BadRequestError("Invalid user");
+        course.createdBy = createdBy;
+      }
+
+      Object.assign(course, {
+        code: updates.code || course.code,
+        name: updates.name || course.name,
+        description:
+          updates.description !== undefined
+            ? updates.description
+            : course.description,
+        credits: updates.credits || course.credits,
       });
-      if (!createdBy) throw new BadRequestError("Invalid user");
-      course.createdBy = createdBy;
+
+      await queryRunner.manager.save(course);
+
+      // Handle module updates if provided
+      if (updates.modules) {
+        // Soft delete existing modules
+        await queryRunner.manager.update(Module, 
+          { course: { id: courseId } },
+          { isDeleted: true }
+        );
+
+        // Create new modules
+        for (const moduleData of updates.modules) {
+          const lecturer = await this.userRepo.findOneBy({
+            id: moduleData.lecturerId,
+            isDeleted: false,
+          });
+          
+          if (!lecturer) {
+            throw new BadRequestError(`Invalid lecturer ID: ${moduleData.lecturerId}`);
+          }
+
+          const moduleEntity = this.moduleRepo.create({
+            name: moduleData.name,
+            code: moduleData.code,
+            semester: moduleData.semester,
+            credits: moduleData.credits,
+            isMandatory: moduleData.isMandatory,
+            lecturer,
+            course,
+            isDeleted: false,
+          });
+
+          await queryRunner.manager.save(moduleEntity);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+      logger.info(`Course updated: ${courseId}`);
+      return course;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      logger.error('Error updating course:', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    Object.assign(course, {
-      code: updates.code || course.code,
-      name: updates.name || course.name,
-      description:
-        updates.description !== undefined
-          ? updates.description
-          : course.description,
-      credits: updates.credits || course.credits,
-    });
-
-    await this.courseRepo.save(course);
-    logger.info(`Course updated: ${courseId}`);
-    return course;
   }
 
   async deleteCourse(courseId: number) {
@@ -247,5 +299,20 @@ export class CourseService {
     await this.enrollmentRepo.save(enrollment);
     logger.info(`Student ${studentId} enrolled in course ${courseId}`);
     return enrollment;
+  }
+
+  async getCourseById(courseId: number) {
+    const course = await this.courseRepo.findOne({
+      where: { id: courseId, isDeleted: false },
+      relations: ["createdBy", "modules", "modules.lecturer"],
+    });
+
+    if (!course) {
+      logger.warn(`Course not found: ${courseId}`);
+      throw new NotFoundError("Course not found");
+    }
+
+    logger.info(`Fetched course with ID: ${courseId}`);
+    return course;
   }
 }

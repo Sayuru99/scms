@@ -1,21 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SemesterType } from './CourseBuilder';
 
 type SemesterDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddSemester: (name: string) => void;
+  editingSemester: SemesterType | null;
 };
 
 const SemesterDialog: React.FC<SemesterDialogProps> = ({ 
   open, 
   onOpenChange, 
-  onAddSemester 
+  onAddSemester,
+  editingSemester
 }) => {
   const [semesterName, setSemesterName] = useState("");
+
+  useEffect(() => {
+    if (editingSemester) {
+      setSemesterName(editingSemester.name);
+    } else {
+      setSemesterName("");
+    }
+  }, [editingSemester]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +41,9 @@ const SemesterDialog: React.FC<SemesterDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] rounded-lg">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Add New Semester</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            {editingSemester ? 'Edit Semester' : 'Add New Semester'}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="space-y-2">
@@ -49,7 +62,7 @@ const SemesterDialog: React.FC<SemesterDialogProps> = ({
               Cancel
             </Button>
             <Button type="submit" disabled={!semesterName.trim()}>
-              Add Semester
+              {editingSemester ? 'Update Semester' : 'Add Semester'}
             </Button>
           </DialogFooter>
         </form>
