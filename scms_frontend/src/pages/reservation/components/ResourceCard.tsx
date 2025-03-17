@@ -23,16 +23,20 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ type, title, description, o
   };
 
   return (
-    <div className="resource-card animate-scale-in">
-      <div className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getTagColor()} mb-2 inline-block`}> {type} </div>
-      <h3 className="resource-title">{title}</h3>
-      <p className="resource-description">{description}</p>
-      <Button 
-        onClick={onReserve} 
-        className="reserve-btn"
-      >
-        Reserve Now
-      </Button>
+    <div className="resource-card animate-scale-in flex flex-col h-full">
+      <div className="flex-grow">
+        <div className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getTagColor()} mb-2 inline-block`}> {type} </div>
+        <h3 className="resource-title">{title}</h3>
+        <p className="resource-description">{description}</p>
+      </div>
+      <div className="mt-auto pt-4">
+        <Button 
+          onClick={onReserve} 
+          className="reserve-btn w-full"
+        >
+          Reserve Now
+        </Button>
+      </div>
     </div>
   );
 };
