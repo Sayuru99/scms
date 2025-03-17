@@ -14,6 +14,7 @@ export type ModuleType = {
   code: string;
   credits: number;
   isMandatory: boolean;
+  lecturerId?: string;
 };
 
 type ModuleProps = {

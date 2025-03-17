@@ -5,6 +5,7 @@ import { Enrollment } from "../entities/Enrollment";
 import { BadRequestError, NotFoundError } from "../utils/errors";
 import logger from "../config/logger";
 import { FindManyOptions, In, Like, Not } from "typeorm";
+import { Module } from "../entities/Module";
 
 interface CourseCreateParams {
   code: string;
@@ -12,6 +13,13 @@ interface CourseCreateParams {
   description?: string;
   credits: number;
   createdById: string;
+  modules?: {
+    name: string;
+    semester: string;
+    credits?: number;
+    isMandatory: boolean;
+    lecturerId: string;
+  }[];
 }
 
 interface CourseFilterParams {
@@ -25,6 +33,7 @@ export class CourseService {
   private courseRepo = AppDataSource.getRepository(Course);
   private userRepo = AppDataSource.getRepository(User);
   private enrollmentRepo = AppDataSource.getRepository(Enrollment);
+  private moduleRepo = AppDataSource.getRepository(Module);
 
   async createCourse(params: CourseCreateParams) {
     const createdBy = await this.userRepo.findOneBy({
@@ -36,18 +45,61 @@ export class CourseService {
       throw new BadRequestError("Invalid user");
     }
 
-    const course = this.courseRepo.create({
-      code: params.code,
-      name: params.name,
-      description: params.description,
-      credits: params.credits,
-      createdBy,
-      isDeleted: false,
-    });
+    // Start a transaction to ensure data consistency
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    await this.courseRepo.save(course);
-    logger.info(`Course created: ${course.id}`);
-    return course;
+    try {
+      // Create the course
+      const course = this.courseRepo.create({
+        code: params.code,
+        name: params.name,
+        description: params.description,
+        credits: params.credits,
+        createdBy,
+        isDeleted: false,
+      });
+
+      await queryRunner.manager.save(course);
+
+      // Create modules if provided
+      if (params.modules && params.modules.length > 0) {
+        for (const moduleData of params.modules) {
+          const lecturer = await this.userRepo.findOneBy({
+            id: moduleData.lecturerId,
+            isDeleted: false,
+          });
+          
+          if (!lecturer) {
+            throw new BadRequestError(`Invalid lecturer ID: ${moduleData.lecturerId}`);
+          }
+
+          const moduleEntity = this.moduleRepo.create({
+            name: moduleData.name,
+            semester: moduleData.semester,
+            credits: moduleData.credits,
+            isMandatory: moduleData.isMandatory,
+            lecturer,
+            course,
+            isDeleted: false,
+          });
+
+          await queryRunner.manager.save(moduleEntity);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+      logger.info(`Course created with ID: ${course.id}`);
+      return course;
+
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      logger.error('Error creating course:', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async getCourses(filters: CourseFilterParams = {}) {

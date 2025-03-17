@@ -9,10 +9,12 @@ type ModuleDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddModule: (module: {
+    id: string;
     title: string;
     code: string;
     credits: number;
     isMandatory: boolean;
+    lecturerId: string;
   }) => void;
 };
 
@@ -38,16 +40,21 @@ const ModuleDialog: React.FC<ModuleDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (moduleData.title.trim() && moduleData.code.trim()) {
-      onAddModule(moduleData);
-      setModuleData({
-        title: "",
-        code: "",
-        credits: 3,
-        isMandatory: true
-      });
-      onOpenChange(false);
-    }
+    onAddModule({
+      id: Math.random().toString(36).substring(2, 9),
+      title: moduleData.title,
+      code: moduleData.code,
+      credits: moduleData.credits,
+      isMandatory: moduleData.isMandatory,
+      lecturerId: '1', // TODO: Replace with actual lecturer selection
+    });
+    onOpenChange(false);
+    setModuleData({
+      title: "",
+      code: "",
+      credits: 3,
+      isMandatory: true
+    });
   };
 
   return (

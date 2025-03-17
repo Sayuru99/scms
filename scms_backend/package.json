@@ -28,6 +28,7 @@
     "jwt-decode": "^4.0.0",
     "mysql2": "^3.7.0",
     "reflect-metadata": "^0.2.1",
+    "smart-campus-user-management": "file:",
     "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
