@@ -5,7 +5,11 @@ import { resourceService, type Reservation } from '../../../lib/api';
 import { Spinner } from '../../../components/ui/Spinner';
 import Cookies from "js-cookie";
 
-const ReservationsTable: React.FC = () => {
+interface ReservationsTableProps {
+  refreshTrigger?: number;
+}
+
+const ReservationsTable: React.FC<ReservationsTableProps> = ({ refreshTrigger = 0 }) => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +59,7 @@ const ReservationsTable: React.FC = () => {
     };
 
     fetchReservations();
-  }, []);
+  }, [refreshTrigger]);
 
   const handleCancel = async (reservation: Reservation) => {
     const accessToken = Cookies.get("accessToken");
