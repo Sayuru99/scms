@@ -1,63 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ResourceCard from './ResourceCard';
 import { Search, Grid2X2, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
+import { resourceService, Resource, ResourceType } from '@/lib/api';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
-interface Resource {
-  id: string;
-  type: 'Lecture Hall' | 'Equipment' | 'Labs';
-  title: string;
-  description: string;
+interface JwtPayload {
+  userId: string;
+  role: string;
+  permissions: string[];
+  exp: number;
 }
 
 const ResourceGrid: React.FC = () => {
   const [filter, setFilter] = useState<string>('All');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  
-  const resources: Resource[] = [
-    {
-      id: '1',
-      type: 'Lecture Hall',
-      title: 'Hall A-101',
-      description: 'Capacity 120 - Projector available - A/C - White board available',
-    },
-    {
-      id: '2',
-      type: 'Lecture Hall',
-      title: 'Hall B-101',
-      description: 'Capacity 120 - Projector available - A/C - White board available',
-    },
-    {
-      id: '3',
-      type: 'Equipment',
-      title: 'Laptop 32',
-      description: '8GB RAM - 120GB SSD - ACER Brand - Charger available',
-    },
-    {
-      id: '4',
-      type: 'Labs',
-      title: 'Computer Lab C2',
-      description: 'Capacity 120 - Projector available - A/C - White board available',
-    },
-  ];
+  const fetchData = async () => {
+    try {
+      const token = Cookies.get('accessToken');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
 
-  const handleReserve = (resource: Resource) => {
-    toast.success(`Reserved ${resource.title}`);
+      const [resourcesResponse, typesResponse] = await Promise.all([
+        resourceService.getResources(token),
+        resourceService.getResourceTypes(token)
+      ]);
+
+      setResources(resourcesResponse.resources);
+      setResourceTypes(typesResponse);
+      setLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch resources');
+      setLoading(false);
+      toast.error('Failed to load resources');
+    }
   };
 
-  
-  const filteredResources = resources.filter((resource) => {
-    const matchesFilter = filter === 'All' || resource.type === filter;
-    const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          resource.description.toLowerCase().includes(searchQuery.toLowerCase());
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleReservationComplete = () => {
+    fetchData(); // Refresh the resources list after a successful reservation
+  };
+
+  const filteredResources = resources.filter(resource => {
+    const matchesFilter = filter === 'All' || resource.type.type.toLowerCase() === filter.toLowerCase();
+    const matchesSearch = resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         resource.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         resource.type.type.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
+  if (loading) {
+    return <div className="text-center py-8">Loading resources...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-8 text-red-500">{error}</div>;
+  }
+
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold">Available Resources</h2>
         <div className="flex items-center gap-2">
@@ -66,9 +79,9 @@ const ResourceGrid: React.FC = () => {
             <input
               type="text"
               placeholder="Search resources..."
-              className="search-input pl-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-2 border rounded-lg w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="view-toggle rounded-md overflow-hidden">
@@ -91,7 +104,7 @@ const ResourceGrid: React.FC = () => {
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {['All', 'Lecture Hall', 'Labs', 'Equipment'].map((option) => (
+        {['All', ...resourceTypes.map(type => type.type)].map((option) => (
           <Button
             key={option}
             onClick={() => setFilter(option)}
@@ -102,17 +115,33 @@ const ResourceGrid: React.FC = () => {
         ))}
       </div>
 
-      <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1'}`}>
-        {filteredResources.map((resource) => (
-          <ResourceCard
-            key={resource.id}
-            type={resource.type}
-            title={resource.title}
-            description={resource.description}
-            onReserve={() => handleReserve(resource)}
-          />
-        ))}
-      </div>
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredResources.map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              id={resource.id}
+              type={resource.type.type}
+              title={resource.name}
+              description={resource.description || ''}
+              onReservationComplete={handleReservationComplete}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredResources.map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              id={resource.id}
+              type={resource.type.type}
+              title={resource.name}
+              description={resource.description || ''}
+              onReservationComplete={handleReservationComplete}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
