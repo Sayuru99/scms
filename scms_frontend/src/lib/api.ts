@@ -353,7 +353,7 @@ export const resourceService = {
     token: string
   ) =>
     apiRequest<{ message: string; reservation: Reservation }>(
-      "/api/resources/reservations",
+      "/api/resources/reservations/create",
       "POST",
       data,
       token,

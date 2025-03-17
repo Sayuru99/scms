@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import ReservationModal from './ReservationModal';
 
 interface ResourceCardProps {
+  id: number;
   type: string;
   title: string;
   description: string;
-  onReserve: () => void;
+  onReservationComplete: () => void;
 }
 
-const ResourceCard: React.FC<ResourceCardProps> = ({ type, title, description, onReserve }) => {
+const ResourceCard: React.FC<ResourceCardProps> = ({ id, type, title, description, onReservationComplete }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Predefined color pairs for common resource types
   const predefinedColors: { [key: string]: { bg: string; text: string } } = {
     'lecture hall': { bg: 'bg-blue-100', text: 'text-blue-800' },
@@ -66,21 +70,31 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ type, title, description, o
   };
 
   return (
-    <div className={`resource-card animate-scale-in flex flex-col h-full ${getCardBgColor()} rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200`}>
-      <div className="flex-grow">
-        <div className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getTagColor()} mb-2 inline-block`}> {type} </div>
-        <h3 className="resource-title font-semibold text-lg mb-2">{title}</h3>
-        <p className="resource-description text-gray-600">{description}</p>
+    <>
+      <div className={`resource-card animate-scale-in flex flex-col h-full ${getCardBgColor()} rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200`}>
+        <div className="flex-grow">
+          <div className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getTagColor()} mb-2 inline-block`}> {type} </div>
+          <h3 className="resource-title font-semibold text-lg mb-2">{title}</h3>
+          <p className="resource-description text-gray-600">{description}</p>
+        </div>
+        <div className="mt-auto pt-4">
+          <Button 
+            onClick={() => setIsModalOpen(true)}
+            className="reserve-btn w-full"
+          >
+            Reserve Now
+          </Button>
+        </div>
       </div>
-      <div className="mt-auto pt-4">
-        <Button 
-          onClick={onReserve} 
-          className="reserve-btn w-full"
-        >
-          Reserve Now
-        </Button>
-      </div>
-    </div>
+
+      <ReservationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        resourceId={id}
+        resourceName={title}
+        onReservationComplete={onReservationComplete}
+      />
+    </>
   );
 };
 
