@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -8,6 +7,9 @@ import AvailableCoursesTable from "./components/AvailableCoursesTable";
 import CreateCourseDialog from "./components/CreateCourseDialog";
 import EditCourseDialog from "./components/EditCourseDialog";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface JwtPayload {
   userId: string;
@@ -21,6 +23,7 @@ function Courses() {
   const [availableCourses, setAvailableCourses] = useState<any[]>([]);
   const [newCourse, setNewCourse] = useState({ code: "", name: "", description: "", credits: "" });
   const [editCourse, setEditCourse] = useState<any | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
@@ -92,14 +95,11 @@ function Courses() {
           {/* <h1 className="text-3xl font-bold mb-6">Courses</h1> */}
 
           {permissions.includes("create:courses") && (
-            <CreateCourseDialog
-              newCourse={newCourse}
-              setNewCourse={setNewCourse}
-              onCreate={() => {
-                fetchEnrolledCourses(Cookies.get("accessToken") || "");
-                fetchAvailableCourses(Cookies.get("accessToken") || "");
-              }}
-            />
+            <div className="flex justify-end mb-4">
+            <Button 
+            onClick={() => navigate('/courses/manage/')}>
+              <Plus className="w-4 h-4 mr-2" /> Add Course</Button>
+          </div>
           )}
 
           <AvailableCoursesTable
