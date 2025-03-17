@@ -23,72 +23,54 @@ const ResourceGrid: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = Cookies.get('accessToken');
-        if (!token) {
-          throw new Error('No authentication token found');
-        }
-
-        const [resourcesResponse, typesResponse] = await Promise.all([
-          resourceService.getResources(token),
-          resourceService.getResourceTypes(token)
-        ]);
-
-        setResources(resourcesResponse.resources);
-        setResourceTypes(typesResponse);
-        setLoading(false);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch resources');
-        setLoading(false);
-        toast.error('Failed to load resources');
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleReserve = async (resource: Resource) => {
+  const fetchData = async () => {
     try {
       const token = Cookies.get('accessToken');
       if (!token) {
         throw new Error('No authentication token found');
       }
 
-      // Here you would typically open a modal or navigate to a reservation form
-      // For now, we'll just show a success message
-      toast.success(`Reserved ${resource.name}`);
+      const [resourcesResponse, typesResponse] = await Promise.all([
+        resourceService.getResources(token),
+        resourceService.getResourceTypes(token)
+      ]);
+
+      setResources(resourcesResponse.resources);
+      setResourceTypes(typesResponse);
+      setLoading(false);
     } catch (err) {
-      toast.error('Failed to reserve resource');
+      setError(err instanceof Error ? err.message : 'Failed to fetch resources');
+      setLoading(false);
+      toast.error('Failed to load resources');
     }
   };
 
-  const filteredResources = resources.filter((resource) => {
-    const matchesFilter = filter === 'All' || resource.type.type === filter;
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleReservationComplete = () => {
+    fetchData(); // Refresh the resources list after a successful reservation
+  };
+
+  const filteredResources = resources.filter(resource => {
+    const matchesFilter = filter === 'All' || resource.type.type.toLowerCase() === filter.toLowerCase();
     const matchesSearch = resource.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (resource.description?.toLowerCase() || '').includes(searchQuery.toLowerCase());
+                         resource.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         resource.type.type.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <div className="text-center py-8">Loading resources...</div>;
   }
 
   if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-[200px] text-red-500">
-        {error}
-      </div>
-    );
+    return <div className="text-center py-8 text-red-500">{error}</div>;
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold">Available Resources</h2>
         <div className="flex items-center gap-2">
@@ -97,9 +79,9 @@ const ResourceGrid: React.FC = () => {
             <input
               type="text"
               placeholder="Search resources..."
-              className="search-input pl-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-2 border rounded-lg w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="view-toggle rounded-md overflow-hidden">
@@ -133,17 +115,33 @@ const ResourceGrid: React.FC = () => {
         ))}
       </div>
 
-      <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1'}`}>
-        {filteredResources.map((resource) => (
-          <ResourceCard
-            key={resource.id}
-            type={resource.type.type}
-            title={resource.name}
-            description={resource.description || ''}
-            onReserve={() => handleReserve(resource)}
-          />
-        ))}
-      </div>
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredResources.map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              id={resource.id}
+              type={resource.type.type}
+              title={resource.name}
+              description={resource.description || ''}
+              onReservationComplete={handleReservationComplete}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredResources.map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              id={resource.id}
+              type={resource.type.type}
+              title={resource.name}
+              description={resource.description || ''}
+              onReservationComplete={handleReservationComplete}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

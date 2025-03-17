@@ -17,8 +17,7 @@ const ReservationsTable: React.FC = () => {
 
       try {
         const response = await resourceService.getReservationsByID(accessToken);
-        // console.log('Reservations response:', response);
-        // console.log('First reservation resource:', response.reservations[0]?.resource);
+        console.log('Full reservation data:', JSON.stringify(response.reservations, null, 2));
         setReservations(response.reservations);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to fetch reservations';
@@ -128,24 +127,18 @@ const ReservationsTable: React.FC = () => {
                   </td>
                   <td className="reservation-td">
                     <div className="flex items-center">
-                      <button
-                        onClick={() => handleCancel(reservation)}
-                        className="action-btn-cancel"
-                        aria-label="Cancel reservation"
-                        disabled={!reservation.resource || reservation.status === 'Rejected' || reservation.status === 'Cancelled'}
-                      >
-                        <X size={18} className="mr-1" />
-                        <span>Cancel</span>
-                      </button>
-                      <button
-                        onClick={() => handleExtend(reservation)}
-                        className="action-btn-extend"
-                        aria-label="Extend reservation"
-                        disabled={!reservation.resource || reservation.status !== 'Approved'}
-                      >
-                        <ArrowRight size={18} className="mr-1" />
-                        <span>Return</span>
-                      </button>
+                      {(reservation.resource?.name?.toLowerCase().includes('laptop') || 
+                        reservation.resource?.name?.toLowerCase().includes('equipment')) && (
+                        <button
+                          onClick={() => handleCancel(reservation)}
+                          className="action-btn-cancel"
+                          aria-label="Cancel reservation"
+                          disabled={!reservation.resource || reservation.status === 'Rejected' || reservation.status === 'Cancelled'}
+                        >
+                          <X size={18} className="mr-1" />
+                          <span>Cancel</span>
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
