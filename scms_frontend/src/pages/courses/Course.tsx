@@ -4,10 +4,10 @@ import { jwtDecode } from "jwt-decode";
 import { courseService, Course } from "../../lib/api";
 import { toast } from "react-toastify";
 import AvailableCoursesTable from "./components/AvailableCoursesTable";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface JwtPayload {
   userId: string;
@@ -20,6 +20,7 @@ function Courses() {
   const [permissions, setPermissions] = useState<string[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
@@ -46,19 +47,25 @@ function Courses() {
     }
   };
 
+  const getBreadcrumbItems = () => {
+    const path = location.pathname;
+    
+    if (path === '/courses') {
+      return (
+        <BreadcrumbItem>
+          <BreadcrumbPage>Courses</BreadcrumbPage>
+        </BreadcrumbItem>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <>
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem className="hidden md:block">
-            <BreadcrumbLink href="#">
-              Courses
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator className="hidden md:block" />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Add Course</BreadcrumbPage>
-          </BreadcrumbItem>
+          {getBreadcrumbItems()}
         </BreadcrumbList>
       </Breadcrumb>
       {permissions.includes("read:courses") ? (
