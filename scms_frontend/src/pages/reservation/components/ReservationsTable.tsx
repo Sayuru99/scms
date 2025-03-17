@@ -65,6 +65,15 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({ refreshTrigger = 
     const accessToken = Cookies.get("accessToken");
     if (!accessToken) return;
 
+    // Show confirmation dialog
+    const isConfirmed = window.confirm(
+      `Are you sure you want to cancel your reservation for ${reservation.resource?.name}?`
+    );
+
+    if (!isConfirmed) {
+      return; // If user clicks Cancel, do nothing
+    }
+
     try {
       await resourceService.cancelReservation(
         reservation.id,
