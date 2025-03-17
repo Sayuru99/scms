@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { PlusCircle, Save, SendHorizontal } from 'lucide-react';
+import { PlusCircle, SendHorizontal } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
+import Cookies from 'js-cookie';
 import Semester from './Semester';
 import SemesterDialog from './SemesterDialog';
 import ModuleDialog from './ModuleDialog';
 import EmptyState from './EmptyState';
 import { ModuleType } from './Module';
+import { courseService } from '@/services/courseService';
 
 type SemesterType = {
   id: string;
@@ -57,6 +59,7 @@ const CourseBuilder: React.FC = () => {
     code: string;
     credits: number;
     isMandatory: boolean;
+    lecturerId?: string;
   }) => {
     if (!activeSemesterId) return;
     
@@ -98,16 +101,7 @@ const CourseBuilder: React.FC = () => {
     });
   };
 
-  const handleSaveDraft = () => {
-    // In a real app, this would save to a backend
-    toast({
-      title: "Draft Saved",
-      description: "Your course has been saved as a draft.",
-    });
-  };
-
-  const handlePublishCourse = () => {
-    // In a real app, this would publish the course
+  const handlePublishCourse = async () => {
     if (!courseTitle.trim()) {
       toast({
         title: "Validation Error",
@@ -116,11 +110,67 @@ const CourseBuilder: React.FC = () => {
       });
       return;
     }
-    
-    toast({
-      title: "Course Published",
-      description: "Your course has been successfully published.",
-    });
+
+    if (!courseCode.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Course code is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const token = Cookies.get('accessToken');
+    if (!token) {
+      toast({
+        title: "Authentication Error",
+        description: "Please log in to create a course.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Transform the data to match the API requirements
+      const courseData = {
+        name: courseTitle,
+        code: courseCode,
+        credits: 0, // You might want to add this as a field in your form
+        modules: semesters.flatMap(semester => 
+          semester.modules.map(module => ({
+            name: module.title,
+            semester: semester.name,
+            credits: module.credits,
+            isMandatory: module.isMandatory,
+          }))
+        )
+      };
+
+      await courseService.createCourse(courseData, token);
+      
+      toast({
+        title: "Success",
+        description: "Your course has been successfully published.",
+      });
+
+      // Reset the form
+      setCourseTitle('');
+      setCourseCode('');
+      setSemesters([]);
+    } catch (error) {
+      console.error('Error publishing course:', error);
+      let errorMessage = "Failed to publish the course. ";
+      
+      if (error instanceof Error) {
+        errorMessage += error.message;
+      }
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
   };
 
   const handleOpenModuleDialog = (semesterId: string) => {
@@ -190,10 +240,6 @@ const CourseBuilder: React.FC = () => {
       </div>
       
       <div className="mt-12 flex justify-end space-x-4">
-        <Button variant="outline" onClick={handleSaveDraft}>
-          <Save size={16} className="mr-2" />
-          Save as Draft
-        </Button>
         <Button onClick={handlePublishCourse}>
           <SendHorizontal size={16} className="mr-2" />
           Publish Course

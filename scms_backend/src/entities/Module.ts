@@ -19,8 +19,11 @@ export class Module {
   @Column({ type: "int", nullable: true })
   credits?: number;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: true })
   lecturer!: User;
+
+  @Column({ name: "is_mandatory", default: false })
+  isMandatory!: boolean;
 
   @Column({ name: "is_deleted", default: false })
   isDeleted!: boolean;
