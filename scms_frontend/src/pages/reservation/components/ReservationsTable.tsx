@@ -36,9 +36,8 @@ const ReservationsTable: React.FC = () => {
     if (!accessToken) return;
 
     try {
-      await resourceService.updateReservation(
+      await resourceService.cancelReservation(
         reservation.id,
-        'Rejected',
         accessToken
       );
       toast.success('Reservation cancelled successfully');

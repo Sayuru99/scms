@@ -64,6 +64,12 @@ router.get(
   resourceController.getReservationsByUserId.bind(resourceController)
 );
 
+// Add new route for cancelling reservations
+router.put(
+  "/reservations/:reservationId/cancel",
+  authMiddleware("create:reservations"),
+  resourceController.cancelReservation.bind(resourceController)
+);
 
 // OLD Reservation routes
 router.put(

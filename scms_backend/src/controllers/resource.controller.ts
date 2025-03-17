@@ -164,6 +164,24 @@ export class ResourceController {
     }
   }
 
+  async cancelReservation(req: Request, res: Response, next: NextFunction) {
+    try {
+      const reservationId = parseInt(req.params.reservationId);
+      const userId = req.user!.userId;
+
+      // First check if the reservation belongs to the user
+      const reservation = await this.resourceService.getReservationById(reservationId);
+      if (reservation.user.id !== userId) {
+        throw new Error("You can only cancel your own reservations");
+      }
+
+      const updatedReservation = await this.resourceService.updateReservation(reservationId, { status: "Cancelled" });
+      res.json({ message: "Reservation cancelled successfully", reservation: updatedReservation });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getReservationsByUserId(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.userId;
