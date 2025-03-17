@@ -4,10 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { courseService, Course } from "../../lib/api";
 import { toast } from "react-toastify";
 import AvailableCoursesTable from "./components/AvailableCoursesTable";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import CourseNav from "@/components/navigation/CourseNav";
 
 interface JwtPayload {
   userId: string;
@@ -19,8 +16,6 @@ interface JwtPayload {
 function Courses() {
   const [permissions, setPermissions] = useState<string[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
@@ -47,48 +42,18 @@ function Courses() {
     }
   };
 
-  const getBreadcrumbItems = () => {
-    const path = location.pathname;
-    
-    if (path === '/courses') {
-      return (
-        <BreadcrumbItem>
-          <BreadcrumbPage>Courses</BreadcrumbPage>
-        </BreadcrumbItem>
-      );
-    }
-
-    return null;
-  };
-
   return (
-    <>
-      <Breadcrumb>
-        <BreadcrumbList>
-          {getBreadcrumbItems()}
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="p-6">
+      <CourseNav permissions={permissions} />
       {permissions.includes("read:courses") ? (
-        <div className="p-6">
-          {permissions.includes("create:courses") && (
-            <div className="flex justify-end mb-4">
-              <Button onClick={() => navigate('/courses/manage/')}>
-                <Plus className="w-4 h-4 mr-2" /> Add Course
-              </Button>
-            </div>
-          )}
-
-          <AvailableCoursesTable
-            courses={availableCourses}
-          />
-        </div>
+        <AvailableCoursesTable courses={availableCourses} />
       ) : (
-        <div className="p-6">
+        <div>
           <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
           <p>You do not have permission to view courses.</p>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
