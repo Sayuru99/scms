@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { User } from "@/lib/api";
 import StudentDashboardHome from "@/pages/dashboard/components/StudentDashboardHome";
+import LecturerDashboardHome from "@/pages/dashboard/components/LecturerDashboardHome";
 import { useAuth } from "@/context/AuthContext";
 import Cookies from "js-cookie";
 
@@ -169,6 +170,7 @@ function Dashboard() {
         </div>
 
         {permissions.includes("read:enrolled_courses") && <StudentDashboardHome />}
+        {permissions.includes("schedule:class") && <LecturerDashboardHome />}
       </div>
 
       <div
