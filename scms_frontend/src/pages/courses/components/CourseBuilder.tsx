@@ -68,7 +68,7 @@ const CourseBuilder: React.FC = () => {
             code: module.code || '',
             credits: module.credits || 0,
             isMandatory: module.isMandatory,
-            lecturerId: module.lecturer?.id
+            lecturerId: module.lecturer ? module.lecturer.id : null
           });
         });
 
@@ -261,7 +261,7 @@ const CourseBuilder: React.FC = () => {
             semester: semester.name,
             credits: module.credits,
             isMandatory: module.isMandatory,
-            lecturerId: module.lecturerId
+            lecturerId: module.lecturerId || null
           }))
         )
       };

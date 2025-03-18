@@ -67,13 +67,16 @@ export class CourseService {
       // Create modules if provided
       if (params.modules && params.modules.length > 0) {
         for (const moduleData of params.modules) {
-          const lecturer = await this.userRepo.findOneBy({
-            id: moduleData.lecturerId,
-            isDeleted: false,
-          });
-          
-          if (!lecturer) {
-            throw new BadRequestError(`Invalid lecturer ID: ${moduleData.lecturerId}`);
+          let lecturer = undefined;
+          if (moduleData.lecturerId) {
+            lecturer = await this.userRepo.findOneBy({
+              id: moduleData.lecturerId,
+              isDeleted: false,
+            });
+            
+            if (!lecturer) {
+              throw new BadRequestError(`Invalid lecturer ID: ${moduleData.lecturerId}`);
+            }
           }
 
           const moduleEntity = this.moduleRepo.create({
@@ -124,85 +127,125 @@ export class CourseService {
   }
 
   async updateCourse(courseId: number, updates: Partial<CourseCreateParams>) {
-    const course = await this.courseRepo.findOne({
-      where: { id: courseId, isDeleted: false },
-      relations: ["modules"],
-    });
-    if (!course) {
-      logger.warn(`Course not found: ${courseId}`);
-      throw new NotFoundError("Course not found");
-    }
-
-    // Start a transaction to ensure data consistency
-    const queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
     try {
-      if (updates.createdById) {
-        const createdBy = await this.userRepo.findOneBy({
-          id: updates.createdById,
-          isDeleted: false,
-        });
-        if (!createdBy) throw new BadRequestError("Invalid user");
-        course.createdBy = createdBy;
+      logger.info(`Starting course update for ID: ${courseId}`);
+      logger.debug('Update data:', updates);
+
+      // Find the course with all necessary relations
+      const course = await this.courseRepo.findOne({
+        where: { id: courseId, isDeleted: false },
+        relations: ["modules", "modules.lecturer"],
+      });
+      
+      if (!course) {
+        logger.warn(`Course not found: ${courseId}`);
+        throw new NotFoundError("Course not found");
       }
 
-      Object.assign(course, {
-        code: updates.code || course.code,
-        name: updates.name || course.name,
-        description:
-          updates.description !== undefined
-            ? updates.description
-            : course.description,
-        credits: updates.credits || course.credits,
-      });
+      // Start a transaction
+      const queryRunner = AppDataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-      await queryRunner.manager.save(course);
+      try {
+        // Update course basic information
+        if (updates.code) course.code = updates.code;
+        if (updates.name) course.name = updates.name;
+        if (updates.description !== undefined) course.description = updates.description;
+        if (updates.credits !== undefined) course.credits = updates.credits;
 
-      // Handle module updates if provided
-      if (updates.modules) {
-        // Soft delete existing modules
-        await queryRunner.manager.update(Module, 
-          { course: { id: courseId } },
-          { isDeleted: true }
-        );
+        // Save course first
+        const savedCourse = await queryRunner.manager.save(Course, course);
 
-        // Create new modules
-        for (const moduleData of updates.modules) {
-          const lecturer = await this.userRepo.findOneBy({
-            id: moduleData.lecturerId,
-            isDeleted: false,
-          });
+        // Handle module updates if provided
+        if (updates.modules) {
+          logger.debug('Processing module updates');
           
-          if (!lecturer) {
-            throw new BadRequestError(`Invalid lecturer ID: ${moduleData.lecturerId}`);
+          // Get all existing modules for this course
+          const existingModules = await queryRunner.manager.find(Module, {
+            where: { course: { id: courseId } },
+            relations: ["lecturer"]
+          });
+
+          // First, soft delete all existing modules
+          for (const module of existingModules) {
+            module.isDeleted = true;
+            await queryRunner.manager.save(Module, module);
           }
 
-          const moduleEntity = this.moduleRepo.create({
-            name: moduleData.name,
-            code: moduleData.code,
-            semester: moduleData.semester,
-            credits: moduleData.credits,
-            isMandatory: moduleData.isMandatory,
-            lecturer,
-            course,
-            isDeleted: false,
-          });
+          // Track module codes to prevent duplicates
+          const moduleCodes = new Set<string>();
 
-          await queryRunner.manager.save(moduleEntity);
+          // Create new modules
+          for (const moduleData of updates.modules) {
+            try {
+              // Validate required fields
+              if (!moduleData.code || !moduleData.name || !moduleData.semester) {
+                throw new BadRequestError('Module must have code, name, and semester');
+              }
+
+              // Check for duplicate module codes
+              if (moduleCodes.has(moduleData.code)) {
+                throw new BadRequestError(`Duplicate module code: ${moduleData.code}`);
+              }
+              moduleCodes.add(moduleData.code);
+
+              // Handle lecturer if provided
+              let lecturer = undefined;
+              if (moduleData.lecturerId) {
+                lecturer = await queryRunner.manager.findOne(User, {
+                  where: { id: moduleData.lecturerId, isDeleted: false }
+                });
+                if (!lecturer) {
+                  throw new BadRequestError(`Invalid lecturer ID: ${moduleData.lecturerId}`);
+                }
+              }
+
+              // Create new module
+              const newModule = queryRunner.manager.create(Module, {
+                name: moduleData.name,
+                code: moduleData.code,
+                semester: moduleData.semester,
+                credits: moduleData.credits ?? 0,
+                isMandatory: moduleData.isMandatory ?? false,
+                lecturer: lecturer,
+                course: savedCourse,
+                isDeleted: false,
+              });
+
+              await queryRunner.manager.save(Module, newModule);
+              logger.debug(`Created new module: ${moduleData.code}`);
+            } catch (error) {
+              logger.error('Error processing module:', error);
+              throw error;
+            }
+          }
         }
-      }
 
-      await queryRunner.commitTransaction();
-      logger.info(`Course updated: ${courseId}`);
-      return course;
+        // Fetch the final updated course with all relations
+        const result = await queryRunner.manager.findOne(Course, {
+          where: { id: courseId },
+          relations: ["createdBy", "modules", "modules.lecturer"],
+        });
+
+        if (!result) {
+          throw new NotFoundError("Course not found after update");
+        }
+
+        await queryRunner.commitTransaction();
+        logger.info(`Course updated successfully: ${courseId}`);
+        return result;
+
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        logger.error('Transaction error updating course:', error);
+        throw error;
+      } finally {
+        await queryRunner.release();
+      }
     } catch (error) {
-      await queryRunner.rollbackTransaction();
-      logger.error('Error updating course:', error);
+      logger.error('Error in updateCourse:', error);
       throw error;
-    } finally {
-      await queryRunner.release();
     }
   }
 

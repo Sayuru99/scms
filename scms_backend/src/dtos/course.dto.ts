@@ -19,7 +19,8 @@ export class ModuleDto {
   isMandatory!: boolean;
 
   @IsString()
-  lecturerId!: string;
+  @IsOptional()
+  lecturerId?: string;
 }
 
 export class CreateCourseDto {
