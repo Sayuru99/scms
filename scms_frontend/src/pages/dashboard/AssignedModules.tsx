@@ -1,7 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { lecturerService } from '../../services/lecturerService';
-import { toast } from 'react-toastify';
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -12,36 +9,56 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import Cookies from 'js-cookie';
 import type { AssignedModule } from '../../services/lecturerService';
+import { Button } from "@/components/ui/button";
+
+// Static data for assigned modules
+const staticModules: AssignedModule[] = [
+  {
+    id: 1,
+    code: "CS101",
+    name: "Introduction to Programming",
+    course: {
+      id: 1,
+      name: "Computer Science",
+      code: "CS"
+    },
+    semester: "1",
+    credits: 3,
+    isMandatory: true
+  },
+  {
+    id: 2,
+    code: "CS102",
+    name: "Data Structures",
+    course: {
+      id: 1,
+      name: "Computer Science",
+      code: "CS"
+    },
+    semester: "2",
+    credits: 4,
+    isMandatory: true
+  },
+  {
+    id: 3,
+    code: "CS201",
+    name: "Web Development",
+    course: {
+      id: 1,
+      name: "Computer Science",
+      code: "CS"
+    },
+    semester: "3",
+    credits: 3,
+    isMandatory: false
+  }
+];
 
 export default function AssignedModules() {
-  const { userId } = useAuth();
-  const [modules, setModules] = useState<AssignedModule[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchAssignedModules = async () => {
-      if (!userId) return;
-
-      const token = Cookies.get('accessToken');
-      if (!token) return;
-
-      try {
-        setLoading(true);
-        const response = await lecturerService.getAssignedModules(userId, token);
-        setModules(response.modules);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch assigned modules');
-        toast.error('Failed to fetch assigned modules');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAssignedModules();
-  }, [userId]);
+  const [modules] = useState<AssignedModule[]>(staticModules);
+  const [loading] = useState(false);
+  const [error] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -79,6 +96,7 @@ export default function AssignedModules() {
                 <TableHead>Semester</TableHead>
                 <TableHead>Credits</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -91,6 +109,15 @@ export default function AssignedModules() {
                   <TableCell>{module.credits}</TableCell>
                   <TableCell>
                     {module.isMandatory ? 'Mandatory' : 'Optional'}
+                  </TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="default" 
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => console.log(`Schedule class for ${module.code}`)}
+                    >
+                      Schedule Class
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

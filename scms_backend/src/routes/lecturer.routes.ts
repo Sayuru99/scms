@@ -5,6 +5,6 @@ import { authMiddleware } from "../middleware/auth.middleware";
 const router = Router();
 const lecturerController = new LecturerController();
 
-router.get("/:id/modules", authMiddleware("read:modules"), lecturerController.getAssignedModules);
+router.get("/:id/modules", authMiddleware("schedule:class"), lecturerController.getAssignedModules);
 
 export default router; 
