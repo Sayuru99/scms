@@ -43,6 +43,15 @@ router.get("/", authMiddleware("read:users"), async (req, res, next) => {
   }
 });
 
+router.get("/:userId", authMiddleware("read:users"), async (req, res, next) => {
+  try {
+    const user = await userService.getUserById(req.params.userId);
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.put(
   "/:userId",
   authMiddleware("update:users"),

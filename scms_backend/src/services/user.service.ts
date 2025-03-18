@@ -194,4 +194,17 @@ export class UserService {
     logger.info(`User self-updated: ${userId}`);
     return user.id;
   }
+
+  async getUserById(userId: string) {
+    const user = await this.userRepo.findOne({
+      where: { id: userId, isDeleted: false },
+      relations: ["role", "role.permissions"],
+    });
+    if (!user) {
+      logger.warn(`User not found: ${userId}`);
+      throw new NotFoundError("User not found");
+    }
+    logger.info(`Fetched user: ${userId}`);
+    return user;
+  }
 }

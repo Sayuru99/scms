@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
 import StudentCourseCard from "./StudentCourseCard";
 import { courseService } from "../../../lib/api";
+import AssignedModules from "../AssignedModules";
 
 interface Course {
   id: number;
@@ -33,7 +34,7 @@ const LecturerDashboardHome: React.FC = () => {
       </motion.div>
 
       <div className="container mx-auto p-4">
-        
+        <AssignedModules />
       </div>
     </div>
   );

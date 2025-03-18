@@ -8,7 +8,7 @@ interface ApiError {
   message: string;
 }
 
-async function apiRequest<T>(
+export async function apiRequest<T>(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   data?: any,
@@ -74,6 +74,9 @@ export const authService = {
 export const userService = {
   getUsers: (token: string) =>
     apiRequest<User[]>("/api/users", "GET", undefined, token),
+
+  getUserById: (userId: string, token: string) =>
+    apiRequest<User>(`/api/users/${userId}`, "GET", undefined, token),
 
   createUser: (userData: CreateUserData, token: string) =>
     apiRequest<{ message: string; userId: string }>(

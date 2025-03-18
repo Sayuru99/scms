@@ -39,8 +39,7 @@ function Dashboard() {
 
   const fetchUserDetails = async (userId: string, token: string) => {
     try {
-      const users = await userService.getUsers(token);
-      const currentUser = users.find((u) => u.id === userId);
+      const currentUser = await userService.getUserById(userId, token);
       if (currentUser) {
         setUserDetails(currentUser);
         setEditDetails({
@@ -124,7 +123,7 @@ function Dashboard() {
 
       <div className="gap-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {permissions.includes("read:users") && (
+          {permissions.includes("create:users") && (
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold mb-2">Overview</h2>
               <p className="text-gray-600">Quick stats about your activity.</p>
@@ -135,7 +134,7 @@ function Dashboard() {
             </div>
           )}
 
-          {permissions.includes("read:users") && (
+          {permissions.includes("create:users") && (
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold mb-2">Current Users</h2>
               <p className="text-gray-600">Total active users in the system.</p>
