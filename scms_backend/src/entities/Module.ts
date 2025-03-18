@@ -23,7 +23,7 @@ export class Module {
   credits?: number;
 
   @ManyToOne(() => User, { nullable: true })
-  lecturer!: User;
+  lecturer?: User;
 
   @Column({ name: "is_mandatory", default: false })
   isMandatory!: boolean;

@@ -20,7 +20,7 @@ export class CourseController {
         ...dto,
         createdById: req.user!.userId,
       });
-      res.status(201).json({ message: "Course created", course });
+      res.status(201).json({ message: "Course created successfully", course });
     } catch (error) {
       next(error);
     }
@@ -52,9 +52,12 @@ export class CourseController {
 
       const course = await this.courseService.updateCourse(
         parseInt(req.params.courseId),
-        dto
+        {
+          ...dto,
+          createdById: req.user!.userId,
+        }
       );
-      res.json({ message: "Course updated", course });
+      res.json({ message: "Course updated successfully", course });
     } catch (error) {
       next(error);
     }

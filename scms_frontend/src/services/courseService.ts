@@ -92,7 +92,7 @@ export interface Course {
 export const courseService = {
   createCourse: (courseData: CourseData, token: string) =>
     apiRequest<{ message: string; course: Course }>(
-      '/api/courses',
+      '/api/courses/create',
       'POST',
       courseData,
       token,
@@ -119,7 +119,7 @@ export const courseService = {
 
   updateCourse: (courseId: number, courseData: CourseData, token: string) =>
     apiRequest<{ message: string; course: Course }>(
-      `/api/courses/${courseId}`,
+      `/api/courses/update/${courseId}`,
       'PUT',
       courseData,
       token,

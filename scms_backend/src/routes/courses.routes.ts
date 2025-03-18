@@ -5,10 +5,18 @@ import { authMiddleware } from "../middleware/auth.middleware";
 const router = Router();
 const courseController = new CourseController();
 
+// Create a new course
 router.post(
-  "/",
+  "/create",
   authMiddleware("create:courses"),
   courseController.createCourse.bind(courseController)
+);
+
+// Update an existing course
+router.put(
+  "/update/:courseId",
+  authMiddleware("update:courses"),
+  courseController.updateCourse.bind(courseController)
 );
 
 router.get(
@@ -33,12 +41,6 @@ router.get(
   "/",
   authMiddleware("read:courses"),
   courseController.getCourses.bind(courseController)
-);
-
-router.put(
-  "/:courseId",
-  authMiddleware("update:courses"),
-  courseController.updateCourse.bind(courseController)
 );
 
 router.delete(

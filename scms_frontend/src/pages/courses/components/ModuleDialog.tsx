@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ModuleType } from './Module';
+import { userService, User } from '@/lib/api';
+import Cookies from 'js-cookie';
 
 type ModuleDialogProps = {
   open: boolean;
@@ -29,8 +32,10 @@ const ModuleDialog: React.FC<ModuleDialogProps> = ({
     title: "",
     code: "",
     credits: 3,
-    isMandatory: true
+    isMandatory: true,
+    lecturerId: "none"
   });
+  const [lecturers, setLecturers] = useState<User[]>([]);
 
   useEffect(() => {
     if (editingModule) {
@@ -38,17 +43,38 @@ const ModuleDialog: React.FC<ModuleDialogProps> = ({
         title: editingModule.title,
         code: editingModule.code,
         credits: editingModule.credits,
-        isMandatory: editingModule.isMandatory
+        isMandatory: editingModule.isMandatory,
+        lecturerId: editingModule.lecturerId || "none"
       });
     } else {
       setModuleData({
         title: "",
         code: "",
         credits: 3,
-        isMandatory: true
+        isMandatory: true,
+        lecturerId: "none"
       });
     }
   }, [editingModule]);
+
+  useEffect(() => {
+    const fetchLecturers = async () => {
+      const token = Cookies.get('accessToken');
+      if (!token) return;
+
+      try {
+        const users = await userService.getUsers(token);
+        const lecturerUsers = users.filter(user => user.role.name === 'Lecturer');
+        setLecturers(lecturerUsers);
+      } catch (error) {
+        console.error('Failed to fetch lecturers:', error);
+      }
+    };
+
+    if (open) {
+      fetchLecturers();
+    }
+  }, [open]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -60,7 +86,10 @@ const ModuleDialog: React.FC<ModuleDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAddModule(moduleData);
+    onAddModule({
+      ...moduleData,
+      lecturerId: moduleData.lecturerId === "none" ? undefined : moduleData.lecturerId
+    });
     onOpenChange(false);
   };
 
@@ -71,6 +100,9 @@ const ModuleDialog: React.FC<ModuleDialogProps> = ({
           <DialogTitle className="text-xl font-semibold">
             {editingModule ? 'Edit Module' : 'Add New Module'}
           </DialogTitle>
+          <DialogDescription>
+            {editingModule ? 'Update the module details below.' : 'Fill in the module details below.'}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="space-y-2">
@@ -125,6 +157,28 @@ const ModuleDialog: React.FC<ModuleDialogProps> = ({
                 <Label htmlFor="optional">Optional</Label>
               </div>
             </RadioGroup>
+          </div>
+          <div className="space-y-2">
+            <Label>Lecturer</Label>
+            <Select
+              value={moduleData.lecturerId}
+              onValueChange={(value) => setModuleData(prev => ({
+                ...prev,
+                lecturerId: value
+              }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a lecturer" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No Lecturer</SelectItem>
+                {lecturers.map((lecturer) => (
+                  <SelectItem key={lecturer.id} value={lecturer.id}>
+                    {lecturer.firstName} {lecturer.lastName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter className="pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
