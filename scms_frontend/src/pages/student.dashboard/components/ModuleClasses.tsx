@@ -17,6 +17,7 @@ interface ScheduleResponse {
   id: number;
   startTime: string;
   endTime: string;
+  date: string;
   location: string | null;
   reservedBy: {
     id: string;
@@ -30,6 +31,22 @@ interface ModuleClassesProps {
   moduleId: number;
   onClose: () => void;
 }
+
+// Function to convert 12-hour time format to 24-hour format
+const convertTo24Hour = (time12h: string): string => {
+  const [time, modifier] = time12h.split(' ');
+  const [hoursStr, minutes] = time.split(':');
+  let hours = parseInt(hoursStr);
+  
+  if (modifier === 'PM' && hours < 12) {
+    hours = hours + 12;
+  }
+  if (modifier === 'AM' && hours === 12) {
+    hours = 0;
+  }
+  
+  return `${hours.toString().padStart(2, '0')}:${minutes}`;
+};
 
 const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, onClose }) => {
   const [classes, setClasses] = useState<ModuleClass[]>([]);
@@ -54,13 +71,35 @@ const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, on
         );
 
         // Transform the API response to match our ModuleClass interface
-        const transformedClasses = response.map(cls => ({
-          id: cls.id.toString(),
-          day: new Date(cls.startTime).toLocaleDateString('en-US', { weekday: 'long' }),
-          time: `${new Date(cls.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${new Date(cls.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
-          location: cls.location || "Not specified",
-          instructor: cls.reservedBy ? `${cls.reservedBy.firstName} ${cls.reservedBy.lastName}` : "Not assigned"
-        }));
+        const transformedClasses = response.map(cls => {
+          // Convert times to 24-hour format
+          const startTime24 = convertTo24Hour(cls.startTime);
+          const endTime24 = convertTo24Hour(cls.endTime);
+
+          // Combine date and time strings
+          const startDateTime = new Date(`${cls.date}T${startTime24}`);
+          const endDateTime = new Date(`${cls.date}T${endTime24}`);
+
+          // Check if dates are valid
+          if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+            console.error('Invalid date received:', cls);
+            return {
+              id: cls.id.toString(),
+              day: 'Invalid Date',
+              time: 'Invalid Time',
+              location: cls.location || "Not specified",
+              instructor: cls.reservedBy ? `${cls.reservedBy.firstName} ${cls.reservedBy.lastName}` : "Not assigned"
+            };
+          }
+
+          return {
+            id: cls.id.toString(),
+            day: startDateTime.toLocaleDateString('en-US', { weekday: 'long' }),
+            time: `${startDateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${endDateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
+            location: cls.location || "Not specified",
+            instructor: cls.reservedBy ? `${cls.reservedBy.firstName} ${cls.reservedBy.lastName}` : "Not assigned"
+          };
+        });
 
         setClasses(transformedClasses);
         setError(null);
