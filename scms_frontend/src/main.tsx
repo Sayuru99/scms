@@ -18,6 +18,7 @@ import ManageCourse from "./pages/courses/ManageCourse.tsx";
 import Chat from "./pages/chat/Chat.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import ProtectedRoute from "./context/ProtectedRoute.tsx";
+import ScheduleClassPage from "./pages/lecturer.dashboard/ScheduleClassPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
                 path: "/chat",
                 element: <Chat />,
               },
+              {
+                path: "/schedule/class/:moduleId",
+                element: <ScheduleClassPage />,
+              }
             ],
           },
         ],

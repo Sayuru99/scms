@@ -2,10 +2,26 @@ import { Request, Response, NextFunction } from "express";
 import { CourseService } from "../services/course.service";
 import { CreateCourseDto, UpdateCourseDto } from "../dtos/course.dto";
 import { validate } from "class-validator";
+import { BadRequestError, NotFoundError } from "../utils/errors";
 import logger from "../config/logger";
 
+function handleControllerError(error: any, res: Response) {
+  logger.error('Controller error:', error);
+  if (error instanceof BadRequestError) {
+    res.status(400).json({ message: error.message });
+  } else if (error instanceof NotFoundError) {
+    res.status(404).json({ message: error.message });
+  } else {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 export class CourseController {
-  private courseService = new CourseService();
+  private courseService: CourseService;
+
+  constructor() {
+    this.courseService = new CourseService();
+  }
 
   async createCourse(req: Request, res: Response, next: NextFunction) {
     try {
@@ -125,6 +141,47 @@ export class CourseController {
       res.json(course);
     } catch (error) {
       next(error);
+    }
+  }
+
+  async getModuleSchedule(req: Request, res: Response, next: NextFunction) {
+    try {
+      const moduleId = parseInt(req.params.moduleId);
+      const schedule = await this.courseService.getModuleSchedule(moduleId);
+      res.json(schedule);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createModuleSchedule(req: Request, res: Response) {
+    try {
+      const moduleId = parseInt(req.params.moduleId);
+      const schedule = await this.courseService.createModuleSchedule(moduleId, req.body);
+      res.status(201).json(schedule);
+    } catch (error) {
+      handleControllerError(error, res);
+    }
+  }
+
+  async updateModuleSchedule(req: Request, res: Response) {
+    try {
+      const moduleId = parseInt(req.params.moduleId);
+      const scheduleId = parseInt(req.params.scheduleId);
+      const schedule = await this.courseService.updateModuleSchedule(moduleId, scheduleId, req.body);
+      res.json(schedule);
+    } catch (error) {
+      handleControllerError(error, res);
+    }
+  }
+
+  async getAllClassSchedules(req: Request, res: Response) {
+    try {
+      const studentId = req.user!.userId;
+      const schedules = await this.courseService.getAllClassSchedules(studentId);
+      res.json(schedules);
+    } catch (error) {
+      handleControllerError(error, res);
     }
   }
 }

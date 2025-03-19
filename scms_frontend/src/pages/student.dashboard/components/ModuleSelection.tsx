@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import ModuleClasses, { ModuleClass } from "./ModuleClasses";
+import ModuleClasses from "./ModuleClasses";
 
 export interface Module {
   id: string;
@@ -11,46 +11,16 @@ export interface Module {
   credits: number;
   schedule: string;
   actionType: "view" | "register";
-  classes?: ModuleClass[];
-}
-
-export interface SemesterData {
-  id: string;
-  name: string;
-  modules: Module[];
 }
 
 interface ModuleSelectionProps {
   title: string;
-  semesters: SemesterData[];
+  semesters: {
+    id: string;
+    name: string;
+    modules: Module[];
+  }[];
 }
-
-// Sample class data generator
-const generateSampleClasses = (moduleTitle: string): ModuleClass[] => {
-  return [
-    {
-      id: "1",
-      day: "Monday",
-      time: "09:00 AM - 11:00 AM",
-      location: "Room A101",
-      instructor: "Dr. Smith"
-    },
-    {
-      id: "2",
-      day: "Wednesday",
-      time: "09:00 AM - 11:00 AM",
-      location: "Room A101",
-      instructor: "Dr. Smith"
-    },
-    {
-      id: "3",
-      day: "Friday",
-      time: "02:00 PM - 04:00 PM",
-      location: "Lab B201",
-      instructor: "Prof. Johnson"
-    }
-  ];
-};
 
 const ModuleSelection: React.FC<ModuleSelectionProps> = ({ title, semesters }) => {
   const [activeTab, setActiveTab] = useState(semesters[0]?.id || "");
@@ -58,12 +28,7 @@ const ModuleSelection: React.FC<ModuleSelectionProps> = ({ title, semesters }) =
 
   const handleModuleAction = (module: Module, actionType: string) => {
     if (actionType === "view") {
-      // Add sample classes to the module if they don't exist
-      const moduleWithClasses = {
-        ...module,
-        classes: module.classes || generateSampleClasses(module.title)
-      };
-      setSelectedModule(moduleWithClasses);
+      setSelectedModule(module);
     } else {
       console.log(`Register action for module ${module.id}`);
     }
@@ -91,7 +56,7 @@ const ModuleSelection: React.FC<ModuleSelectionProps> = ({ title, semesters }) =
           >
             <ModuleClasses
               moduleTitle={selectedModule.title}
-              classes={selectedModule.classes || []}
+              moduleId={parseInt(selectedModule.id)}
               onClose={() => setSelectedModule(null)}
             />
           </motion.div>
@@ -131,10 +96,10 @@ const ModuleSelection: React.FC<ModuleSelectionProps> = ({ title, semesters }) =
                             <div className="flex-1">
                               <h3 className="font-medium mb-2">{module.title}</h3>
                               <p className="text-sm text-muted-foreground mb-1">Credits: {module.credits}</p>
-                              <div className="flex items-center text-sm text-muted-foreground">
+                              {/* <div className="flex items-center text-sm text-muted-foreground">
                                 <Clock className="h-3.5 w-3.5 mr-1.5" />
                                 <span>Classes: {module.schedule}</span>
-                              </div>
+                              </div> */}
                             </div>
                             
                             <Button

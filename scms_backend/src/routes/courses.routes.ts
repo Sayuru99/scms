@@ -60,4 +60,32 @@ router.post(
   courseController.enrollStudent.bind(courseController)
 );
 
+// get module schedule
+router.get(
+  "/:moduleId/schedule",
+  authMiddleware("read:class"),
+  courseController.getModuleSchedule.bind(courseController)
+);
+
+// create module schedule
+router.post(
+  "/:moduleId/schedule",
+  authMiddleware("schedule:class"),
+  courseController.createModuleSchedule.bind(courseController)
+);
+
+// update module schedule
+router.put(
+  "/:moduleId/schedule/:scheduleId",
+  authMiddleware("schedule:class"),
+  courseController.updateModuleSchedule.bind(courseController)
+);
+
+// get all class schedules
+router.get(
+  "/schedules",
+  authMiddleware("read:class"),
+  courseController.getAllClassSchedules.bind(courseController)
+);
+
 export default router;

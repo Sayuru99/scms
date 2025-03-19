@@ -6,6 +6,7 @@ import { BadRequestError, NotFoundError } from "../utils/errors";
 import logger from "../config/logger";
 import { FindManyOptions, In, Like, Not } from "typeorm";
 import { Module } from "../entities/Module";
+import { Class } from "../entities/Class";
 
 interface CourseCreateParams {
   code: string;
@@ -360,5 +361,266 @@ export class CourseService {
 
     logger.info(`Fetched course with ID: ${courseId}`);
     return course;
+  }
+
+  async getModuleSchedule(moduleId: number) {
+    try {
+      logger.info(`Fetching schedule for module ${moduleId}`);
+      
+      // First verify that the module exists and is not deleted
+      const module = await this.moduleRepo.findOne({
+        where: { id: moduleId, isDeleted: false },
+        relations: ["lecturer"]
+      });
+
+      if (!module) {
+        logger.warn(`Module not found: ${moduleId}`);
+        throw new NotFoundError("Module not found");
+      }
+
+      logger.info(`Found module: ${module.name} (${module.code})`);
+
+      // Get all scheduled classes for this module
+      const classRepo = AppDataSource.getRepository(Class);
+      const queryBuilder = classRepo
+        .createQueryBuilder("class")
+        .leftJoinAndSelect("class.module", "module")
+        .leftJoinAndSelect("class.reservedBy", "reservedBy")
+        .where("module.id = :moduleId", { moduleId })
+        .andWhere("class.isDeleted = :isDeleted", { isDeleted: false })
+        .orderBy("class.startTime", "ASC");
+
+      logger.debug('Executing query:', queryBuilder.getSql());
+      
+      const classes = await queryBuilder.getMany();
+      logger.info(`Found ${classes.length} classes for module ${moduleId}`);
+
+      // Transform the data to match the frontend's expected format
+      const schedule = classes.map(cls => {
+        try {
+          return {
+            id: cls.id.toString(),
+            week: this.getWeekNumber(cls.startTime),
+            startTime: this.formatTime(cls.startTime),
+            endTime: this.formatTime(cls.endTime),
+            date: cls.startTime.toISOString().split('T')[0],
+            location: cls.location || "Not specified",
+            capacity: cls.capacity,
+            reservedBy: cls.reservedBy ? {
+              id: cls.reservedBy.id,
+              firstName: cls.reservedBy.firstName,
+              lastName: cls.reservedBy.lastName
+            } : null
+          };
+        } catch (error) {
+          logger.error('Error transforming class data:', error);
+          logger.error('Problematic class data:', JSON.stringify(cls, null, 2));
+          throw error;
+        }
+      });
+
+      logger.info(`Successfully transformed ${schedule.length} schedules`);
+      return schedule;
+
+    } catch (error) {
+      logger.error('Error in getModuleSchedule:', error);
+      logger.error('Module ID:', moduleId);
+      throw error;
+    }
+  }
+
+  private getWeekNumber(date: Date): number {
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+    return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+  }
+
+  private formatTime(date: Date): string {
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+
+  async createModuleSchedule(moduleId: number, data: {
+    week: number;
+    startTime: string;
+    endTime: string;
+    location?: string;
+    capacity: number;
+  }) {
+    // First verify that the module exists and is not deleted
+    const module = await this.moduleRepo.findOne({
+      where: { id: moduleId, isDeleted: false },
+      relations: ["lecturer"]
+    });
+
+    if (!module) {
+      logger.warn(`Module not found: ${moduleId}`);
+      throw new NotFoundError("Module not found");
+    }
+
+    // Create a new class schedule
+    const classRepo = AppDataSource.getRepository(Class);
+    const newClass = classRepo.create({
+      startTime: new Date(data.startTime),
+      endTime: new Date(data.endTime),
+      location: data.location,
+      capacity: data.capacity,
+      isDeleted: false
+    });
+
+    // Set the module relationship
+    newClass.module = module;
+
+    await classRepo.save(newClass);
+
+    // Return the created schedule in the same format as getModuleSchedule
+    return {
+      id: newClass.id.toString(),
+      week: this.getWeekNumber(newClass.startTime),
+      startTime: this.formatTime(newClass.startTime),
+      endTime: this.formatTime(newClass.endTime),
+      location: newClass.location || "Not specified",
+      capacity: newClass.capacity,
+      reservedBy: null
+    };
+  }
+
+  async updateModuleSchedule(moduleId: number, scheduleId: number, data: {
+    startTime?: string;
+    endTime?: string;
+    location?: string;
+    capacity?: number;
+    isDeleted?: boolean;
+  }) {
+    // First verify that the module exists and is not deleted
+    const module = await this.moduleRepo.findOne({
+      where: { id: moduleId, isDeleted: false },
+      relations: ["lecturer"]
+    });
+
+    if (!module) {
+      logger.warn(`Module not found: ${moduleId}`);
+      throw new NotFoundError("Module not found");
+    }
+
+    // Find the class schedule
+    const classRepo = AppDataSource.getRepository(Class);
+    const existingClass = await classRepo.findOne({
+      where: { id: scheduleId, module: { id: moduleId }, isDeleted: false }
+    });
+
+    if (!existingClass) {
+      logger.warn(`Schedule not found: ${scheduleId}`);
+      throw new NotFoundError("Schedule not found");
+    }
+
+    // Update the class schedule
+    if (data.startTime) existingClass.startTime = new Date(data.startTime);
+    if (data.endTime) existingClass.endTime = new Date(data.endTime);
+    if (data.location !== undefined) existingClass.location = data.location;
+    if (data.capacity !== undefined) existingClass.capacity = data.capacity;
+    if (data.isDeleted !== undefined) existingClass.isDeleted = data.isDeleted;
+
+    await classRepo.save(existingClass);
+
+    if (data.isDeleted) {
+      logger.info(`Schedule ${scheduleId} marked as deleted`);
+      return { message: "Schedule deleted successfully" };
+    }
+
+    // Return the updated schedule in the same format as getModuleSchedule
+    return {
+      id: existingClass.id.toString(),
+      week: this.getWeekNumber(existingClass.startTime),
+      startTime: this.formatTime(existingClass.startTime),
+      endTime: this.formatTime(existingClass.endTime),
+      date: existingClass.startTime.toISOString().split('T')[0],
+      location: existingClass.location || "Not specified",
+      capacity: existingClass.capacity,
+      reservedBy: null
+    };
+  }
+
+  async getAllClassSchedules(studentId: string) {
+    try {
+      logger.info(`Fetching class schedules for student ${studentId}`);
+      
+      // First get all modules for courses the student is enrolled in
+      const moduleRepo = AppDataSource.getRepository(Module);
+      const modules = await moduleRepo
+        .createQueryBuilder("module")
+        .innerJoin("module.course", "course")
+        .innerJoin("course.enrollments", "enrollment")
+        .where("enrollment.studentId = :studentId", { studentId })
+        .andWhere("enrollment.isDeleted = false")
+        .andWhere("module.isDeleted = false")
+        .getMany();
+
+      if (modules.length === 0) {
+        logger.info(`No modules found for student ${studentId}`);
+        return [];
+      }
+
+      const moduleIds = modules.map(module => module.id);
+      logger.debug(`Found ${moduleIds.length} modules for student`);
+
+      // Get all classes for these modules
+      const classRepo = AppDataSource.getRepository(Class);
+      const classes = await classRepo
+        .createQueryBuilder("class")
+        .innerJoinAndSelect("class.module", "module")
+        .leftJoinAndSelect("module.lecturer", "lecturer")
+        .where("module.id IN (:...moduleIds)", { moduleIds })
+        .andWhere("class.isDeleted = false")
+        .orderBy("class.startTime", "ASC")
+        .getMany();
+
+      logger.debug(`Found ${classes.length} classes for the modules`);
+
+      // Log each class's dates for debugging
+      classes.forEach(cls => {
+        logger.debug(`Class ID ${cls.id} dates:`, {
+          rawStartTime: cls.startTime,
+          formattedStartTime: cls.startTime.toISOString(),
+          rawEndTime: cls.endTime,
+          formattedEndTime: cls.endTime.toISOString(),
+          moduleCode: cls.module.code,
+          moduleName: cls.module.name
+        });
+      });
+
+      // Transform the data
+      const transformedClasses = classes.map(cls => {
+        const transformed = {
+          id: cls.id.toString(),
+          title: `${cls.module.code} - ${cls.module.name}`,
+          startTime: cls.startTime.toISOString(),
+          endTime: cls.endTime.toISOString(),
+          location: cls.location || "TBA",
+          module: {
+            name: cls.module.name,
+            code: cls.module.code,
+            lecturer: cls.module.lecturer ? {
+              firstName: cls.module.lecturer.firstName,
+              lastName: cls.module.lecturer.lastName
+            } : null
+          }
+        };
+
+        logger.debug(`Transformed class ${cls.id}:`, transformed);
+        return transformed;
+      });
+
+      logger.info(`Successfully transformed ${transformedClasses.length} classes`);
+      return transformedClasses;
+
+    } catch (error) {
+      logger.error('Error in getAllClassSchedules:', error);
+      logger.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
+      throw error;
+    }
   }
 }

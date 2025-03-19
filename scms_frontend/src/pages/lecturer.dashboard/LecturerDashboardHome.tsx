@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
 import { lecturerService } from "../../lib/api";
-import AssignedModules from "../dashboard/components/AssignedModules";
+import AssignedModules from "./components/AssignedModules";
 
 const LecturerDashboardHome: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CalendarHeader from './components/CalendarHeader';
 import CalendarGrid from './components/CalendarGrid';
 import CalendarFilter from './components/CalendarFilter';
@@ -6,12 +6,75 @@ import EventDetailsModal from './components/EventDetailsModal';
 import { events } from '../../data/events';
 import type { Event } from '../../data/events';
 import type { CalendarView } from '../../utils/Calendar';
+import { apiRequest } from '@/lib/api';
+import Cookies from 'js-cookie';
+
+interface ClassSchedule {
+  id: string;
+  startTime: string;
+  endTime: string;
+  location: string | null;
+  capacity: number;
+  module: {
+    name: string;
+    code: string;
+    lecturer?: {
+      firstName: string;
+      lastName: string;
+    };
+  };
+}
 
 const Calendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date(2025, 2, 1)); // March 2025
   const [view, setView] = useState<CalendarView>('month');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAllEvents();
+  }, []);
+
+  const fetchAllEvents = async () => {
+    try {
+      setLoading(true);
+      const token = Cookies.get("accessToken");
+      if (!token) {
+        console.error("No authentication token found");
+        return;
+      }
+
+      // Fetch all class schedules
+      const schedules = await apiRequest<ClassSchedule[]>(
+        '/api/courses/schedules',
+        'GET',
+        undefined,
+        token
+      );
+
+      // Transform class schedules into events
+      const classEvents: Event[] = schedules.map(schedule => ({
+        id: schedule.id,
+        title: `${schedule.module.code} - ${schedule.module.name}`,
+        date: new Date(schedule.startTime),
+        endDate: new Date(schedule.endTime),
+        location: schedule.location || undefined,
+        details: `Capacity: ${schedule.capacity}${schedule.module.lecturer ? ` | Lecturer: ${schedule.module.lecturer.firstName} ${schedule.module.lecturer.lastName}` : ''}`,
+        type: 'Academic Schedule',
+        allDay: false,
+        participants: schedule.capacity
+      }));
+
+      // Combine class events with regular events
+      setAllEvents([...events, ...classEvents]);
+    } catch (err) {
+      console.error('Error fetching events:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePrevious = () => {
     const newDate = new Date(currentDate);
@@ -72,7 +135,7 @@ const Calendar: React.FC = () => {
       calendarContent = (
         <CalendarGrid 
           currentDate={currentDate} 
-          events={events} 
+          events={allEvents} 
           onEventClick={handleEventClick} 
           activeFilters={activeFilters}
         />
@@ -103,6 +166,14 @@ const Calendar: React.FC = () => {
       calendarContent = null;
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="calendar-container overflow-hidden">
       <CalendarHeader 
@@ -121,11 +192,11 @@ const Calendar: React.FC = () => {
         {calendarContent}
       </div>
       
-      {/* <EventDetailsModal 
+      <EventDetailsModal 
         event={selectedEvent} 
         isOpen={!!selectedEvent} 
         onClose={handleCloseModal} 
-      /> */}
+      />
     </div>
   );
 };
