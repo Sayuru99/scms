@@ -5,7 +5,11 @@ import { resourceService, type Reservation } from '../../../lib/api';
 import { Spinner } from '../../../components/ui/Spinner';
 import Cookies from "js-cookie";
 
-const ReservationsTable: React.FC = () => {
+interface ReservationsTableProps {
+  refreshTrigger?: number;
+}
+
+const ReservationsTable: React.FC<ReservationsTableProps> = ({ refreshTrigger = 0 }) => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +22,33 @@ const ReservationsTable: React.FC = () => {
       try {
         const response = await resourceService.getReservationsByID(accessToken);
         console.log('Full reservation data:', JSON.stringify(response.reservations, null, 2));
-        setReservations(response.reservations);
+        
+        // Check for expired non-Equipment reservations
+        const now = new Date();
+        const updatedReservations = await Promise.all(
+          response.reservations.map(async (reservation) => {
+            const endTime = new Date(reservation.endTime);
+            const isEquipment = reservation.resource?.name?.toLowerCase().includes('laptop') || 
+                              reservation.resource?.name?.toLowerCase().includes('equipment');
+            
+            // If it's not equipment and the time has passed, mark it as deleted
+            if (!isEquipment && endTime < now && !reservation.isDeleted) {
+              try {
+                await resourceService.cancelReservation(
+                  reservation.id,
+                  accessToken
+                );
+                return { ...reservation, isDeleted: true };
+              } catch (error) {
+                console.error('Failed to mark reservation as deleted:', error);
+                return reservation;
+              }
+            }
+            return reservation;
+          })
+        );
+        
+        setReservations(updatedReservations);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to fetch reservations';
         setError(message);
@@ -29,16 +59,24 @@ const ReservationsTable: React.FC = () => {
     };
 
     fetchReservations();
-  }, []);
+  }, [refreshTrigger]);
 
   const handleCancel = async (reservation: Reservation) => {
     const accessToken = Cookies.get("accessToken");
     if (!accessToken) return;
 
+    // Show confirmation dialog
+    const isConfirmed = window.confirm(
+      `Are you sure you want to cancel your reservation for ${reservation.resource?.name}?`
+    );
+
+    if (!isConfirmed) {
+      return; // If user clicks Cancel, do nothing
+    }
+
     try {
-      await resourceService.updateReservation(
+      await resourceService.cancelReservation(
         reservation.id,
-        'Rejected',
         accessToken
       );
       toast.success('Reservation cancelled successfully');

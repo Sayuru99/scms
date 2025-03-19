@@ -258,7 +258,7 @@ export class ResourceService {
     return reservation;
   }
 
-  async updateReservation(reservationId: number, updates: { status: "Approved" | "Rejected" | "Returned" }, approvedById?: string) {
+  async updateReservation(reservationId: number, updates: { status: "Approved" | "Rejected" | "Returned" | "Cancelled" }, approvedById?: string) {
     const reservation = await this.reservationRepo.findOne({
       where: { id: reservationId, isDeleted: false },
       relations: ["resource"],
@@ -279,8 +279,11 @@ export class ResourceService {
 
     if (updates.status === "Approved") {
       reservation.resource.status = "Reserved";
-    } else if (updates.status === "Rejected" || updates.status === "Returned") {
-      reservation.resource.status = "Available"; 
+    } else if (updates.status === "Rejected" || updates.status === "Returned" || updates.status === "Cancelled") {
+      reservation.resource.status = "Available";
+      if (updates.status === "Cancelled") {
+        reservation.isDeleted = true;
+      }
     }
 
     await this.resourceRepo.save(reservation.resource);

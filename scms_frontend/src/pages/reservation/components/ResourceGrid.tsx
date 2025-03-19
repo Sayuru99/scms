@@ -14,7 +14,11 @@ interface JwtPayload {
   exp: number;
 }
 
-const ResourceGrid: React.FC = () => {
+interface ResourceGridProps {
+  onReservationComplete: () => void;
+}
+
+const ResourceGrid: React.FC<ResourceGridProps> = ({ onReservationComplete }) => {
   const [filter, setFilter] = useState<string>('All');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -51,6 +55,7 @@ const ResourceGrid: React.FC = () => {
 
   const handleReservationComplete = () => {
     fetchData(); // Refresh the resources list after a successful reservation
+    onReservationComplete(); // Call the parent's onReservationComplete to refresh the table
   };
 
   const filteredResources = resources.filter(resource => {

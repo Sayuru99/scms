@@ -372,6 +372,15 @@ export const resourceService = {
       true
     ),
 
+  cancelReservation: (reservationId: number, token: string) =>
+    apiRequest<{ message: string; reservation: Reservation }>(
+      `/api/resources/reservations/${reservationId}/cancel`,
+      "PUT",
+      undefined,
+      token,
+      true
+    ),
+
   requestResource: (
     resourceId: number,
     data: { startTime: string; endTime: string; purpose?: string },
