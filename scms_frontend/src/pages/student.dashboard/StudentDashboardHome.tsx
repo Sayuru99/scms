@@ -17,6 +17,7 @@ interface Course {
     credits?: number;
     semester: string;
     isMandatory: boolean;
+    isDeleted?: boolean;
     lecturer?: { id: string };
   }>;
 }
@@ -79,24 +80,26 @@ const StudentDashboardHome: React.FC = () => {
 
     const semesterMap = new Map<string, SemesterData>();
     
-    course.modules.forEach(module => {
-      if (!semesterMap.has(module.semester)) {
-        semesterMap.set(module.semester, {
-          id: module.semester,
-          name: module.semester,
-          modules: []
-        });
-      }
+    course.modules
+      .filter(module => !module.isDeleted)
+      .forEach(module => {
+        if (!semesterMap.has(module.semester)) {
+          semesterMap.set(module.semester, {
+            id: module.semester,
+            name: module.semester,
+            modules: []
+          });
+        }
 
-      const semester = semesterMap.get(module.semester)!;
-      semester.modules.push({
-        id: module.id.toString(),
-        title: module.name,
-        credits: module.credits || 0,
-        schedule: "Schedule TBD", // You might want to add this to your module data
-        actionType: "view"
+        const semester = semesterMap.get(module.semester)!;
+        semester.modules.push({
+          id: module.id.toString(),
+          title: module.name,
+          credits: module.credits || 0,
+          schedule: "Schedule TBD",
+          actionType: "view"
+        });
       });
-    });
 
     return Array.from(semesterMap.values());
   };

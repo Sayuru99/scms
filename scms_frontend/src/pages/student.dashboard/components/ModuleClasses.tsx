@@ -10,6 +10,11 @@ export interface ModuleClass {
   day: string;
   time: string;
   location: string;
+  lecturer?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 
 interface ScheduleResponse {
@@ -25,6 +30,13 @@ interface ScheduleResponse {
     firstName: string;
     lastName: string;
   } | null;
+  module: {
+    lecturer?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    };
+  };
 }
 
 interface ModuleClassesProps {
@@ -53,6 +65,7 @@ const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, on
   const [classes, setClasses] = useState<ModuleClass[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lecturer, setLecturer] = useState<{ firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -71,6 +84,11 @@ const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, on
           token
         );
 
+        // Set lecturer information from the first class's module
+        if (response.length > 0 && response[0].module?.lecturer) {
+          setLecturer(response[0].module.lecturer);
+        }
+
         // Transform the API response to match our ModuleClass interface
         const transformedClasses = response.map(cls => {
           // Convert times to 24-hour format
@@ -88,7 +106,8 @@ const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, on
               id: cls.id,
               day: 'Invalid Date',
               time: 'Invalid Time',
-              location: cls.location || "Not specified"
+              location: cls.location || "Not specified",
+              lecturer: cls.module?.lecturer
             };
           }
 
@@ -96,7 +115,8 @@ const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, on
             id: cls.id,
             day: startDateTime.toLocaleDateString('en-US', { weekday: 'long' }),
             time: `${startDateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${endDateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
-            location: cls.location || "Not specified"
+            location: cls.location || "Not specified",
+            lecturer: cls.module?.lecturer
           };
         });
 
@@ -128,6 +148,15 @@ const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, on
         >
           Close
         </button>
+      </div>
+
+      <div className="text-sm">
+        <span className="font-semibold">Module Lecturer: </span>
+        {lecturer ? (
+          <span>{lecturer.firstName} {lecturer.lastName}</span>
+        ) : (
+          <span className="text-muted-foreground">Not assigned</span>
+        )}
       </div>
 
       {loading ? (
