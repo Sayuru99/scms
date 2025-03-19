@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
-import StudentCourseCard from "./StudentCourseCard";
-import { courseService } from "../../../lib/api";
-import ModuleSelection, { SemesterData } from "./ModuleSelection";
+import StudentCourseCard from "./components/StudentCourseCard";
+import { courseService } from "../../lib/api";
+import ModuleSelection, { SemesterData } from "./components/ModuleSelection";
 
 interface Course {
   id: number;

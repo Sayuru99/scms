@@ -139,7 +139,7 @@ export function ScheduleModal({ isOpen, onClose, moduleCode, moduleName }: Sched
                       <Input
                         type="time"
                         value={editingSchedule.startTime}
-                        onChange={(e) => setEditingSchedule({
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingSchedule({
                           ...editingSchedule,
                           startTime: e.target.value
                         })}
@@ -150,7 +150,7 @@ export function ScheduleModal({ isOpen, onClose, moduleCode, moduleName }: Sched
                       <Input
                         type="time"
                         value={editingSchedule.endTime}
-                        onChange={(e) => setEditingSchedule({
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingSchedule({
                           ...editingSchedule,
                           endTime: e.target.value
                         })}
@@ -160,7 +160,7 @@ export function ScheduleModal({ isOpen, onClose, moduleCode, moduleName }: Sched
                       <Label>Location</Label>
                       <Input
                         value={editingSchedule.location}
-                        onChange={(e) => setEditingSchedule({
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingSchedule({
                           ...editingSchedule,
                           location: e.target.value
                         })}
@@ -210,7 +210,7 @@ export function ScheduleModal({ isOpen, onClose, moduleCode, moduleName }: Sched
                     <Input
                       type="number"
                       value={newSchedule.week}
-                      onChange={(e) => setNewSchedule({
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewSchedule({
                         ...newSchedule,
                         week: parseInt(e.target.value)
                       })}
@@ -221,7 +221,7 @@ export function ScheduleModal({ isOpen, onClose, moduleCode, moduleName }: Sched
                     <Input
                       type="time"
                       value={newSchedule.startTime}
-                      onChange={(e) => setNewSchedule({
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewSchedule({
                         ...newSchedule,
                         startTime: e.target.value
                       })}
@@ -232,7 +232,7 @@ export function ScheduleModal({ isOpen, onClose, moduleCode, moduleName }: Sched
                     <Input
                       type="time"
                       value={newSchedule.endTime}
-                      onChange={(e) => setNewSchedule({
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewSchedule({
                         ...newSchedule,
                         endTime: e.target.value
                       })}
@@ -242,7 +242,7 @@ export function ScheduleModal({ isOpen, onClose, moduleCode, moduleName }: Sched
                     <Label>Location</Label>
                     <Input
                       value={newSchedule.location}
-                      onChange={(e) => setNewSchedule({
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewSchedule({
                         ...newSchedule,
                         location: e.target.value
                       })}

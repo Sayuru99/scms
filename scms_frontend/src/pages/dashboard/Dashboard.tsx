@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { User } from "@/lib/api";
-import StudentDashboardHome from "@/pages/dashboard/components/StudentDashboardHome";
-import LecturerDashboardHome from "@/pages/dashboard/components/LecturerDashboardHome";
+import StudentDashboardHome from "../student.dashboard/StudentDashboardHome";
+import LecturerDashboardHome from "@/pages/lecturer.dashboard/LecturerDashboardHome";
 import { useAuth } from "@/context/AuthContext";
 import Cookies from "js-cookie";
 

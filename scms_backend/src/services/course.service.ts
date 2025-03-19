@@ -292,6 +292,7 @@ export class CourseService {
     const enrolledCourseIds = (
       await this.enrollmentRepo.find({
         where: { student: { id: studentId }, isDeleted: false },
+        relations: ["course"],
         select: ["course"],
       })
     ).map((enrollment) => enrollment.course.id);
@@ -303,10 +304,12 @@ export class CourseService {
       relations: ["createdBy"],
     });
 
-    logger.info(
-      `Fetched ${courses.length} available courses for student ${studentId}`
-    );
-    return { courses, total, page, limit };
+    return {
+      courses,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async enrollStudent(studentId: string, courseId: number) {
