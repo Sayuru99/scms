@@ -364,45 +364,69 @@ export class CourseService {
   }
 
   async getModuleSchedule(moduleId: number) {
-    // First verify that the module exists and is not deleted
-    const module = await this.moduleRepo.findOne({
-      where: { id: moduleId, isDeleted: false },
-      relations: ["lecturer"]
-    });
+    try {
+      logger.info(`Fetching schedule for module ${moduleId}`);
+      
+      // First verify that the module exists and is not deleted
+      const module = await this.moduleRepo.findOne({
+        where: { id: moduleId, isDeleted: false },
+        relations: ["lecturer"]
+      });
 
-    if (!module) {
-      logger.warn(`Module not found: ${moduleId}`);
-      throw new NotFoundError("Module not found");
+      if (!module) {
+        logger.warn(`Module not found: ${moduleId}`);
+        throw new NotFoundError("Module not found");
+      }
+
+      logger.info(`Found module: ${module.name} (${module.code})`);
+
+      // Get all scheduled classes for this module
+      const classRepo = AppDataSource.getRepository(Class);
+      const queryBuilder = classRepo
+        .createQueryBuilder("class")
+        .leftJoinAndSelect("class.module", "module")
+        .leftJoinAndSelect("class.reservedBy", "reservedBy")
+        .where("module.id = :moduleId", { moduleId })
+        .andWhere("class.isDeleted = :isDeleted", { isDeleted: false })
+        .orderBy("class.startTime", "ASC");
+
+      logger.debug('Executing query:', queryBuilder.getSql());
+      
+      const classes = await queryBuilder.getMany();
+      logger.info(`Found ${classes.length} classes for module ${moduleId}`);
+
+      // Transform the data to match the frontend's expected format
+      const schedule = classes.map(cls => {
+        try {
+          return {
+            id: cls.id.toString(),
+            week: this.getWeekNumber(cls.startTime),
+            startTime: this.formatTime(cls.startTime),
+            endTime: this.formatTime(cls.endTime),
+            date: cls.startTime.toISOString().split('T')[0],
+            location: cls.location || "Not specified",
+            capacity: cls.capacity,
+            reservedBy: cls.reservedBy ? {
+              id: cls.reservedBy.id,
+              firstName: cls.reservedBy.firstName,
+              lastName: cls.reservedBy.lastName
+            } : null
+          };
+        } catch (error) {
+          logger.error('Error transforming class data:', error);
+          logger.error('Problematic class data:', JSON.stringify(cls, null, 2));
+          throw error;
+        }
+      });
+
+      logger.info(`Successfully transformed ${schedule.length} schedules`);
+      return schedule;
+
+    } catch (error) {
+      logger.error('Error in getModuleSchedule:', error);
+      logger.error('Module ID:', moduleId);
+      throw error;
     }
-
-    // Get all scheduled classes for this module
-    const classes = await AppDataSource
-      .getRepository(Class)
-      .createQueryBuilder("class")
-      .leftJoinAndSelect("class.reservedBy", "reservedBy")
-      .where("class.moduleId = :moduleId", { moduleId })
-      .andWhere("class.isDeleted = :isDeleted", { isDeleted: false })
-      .orderBy("class.startTime", "ASC")
-      .getMany();
-
-    // Transform the data to match the frontend's expected format
-    const schedule = classes.map(cls => ({
-      id: cls.id.toString(),
-      week: this.getWeekNumber(cls.startTime),
-      startTime: this.formatTime(cls.startTime),
-      endTime: this.formatTime(cls.endTime),
-      date: cls.startTime.toISOString().split('T')[0],
-      location: cls.location || "Not specified",
-      capacity: cls.capacity,
-      reservedBy: cls.reservedBy ? {
-        id: cls.reservedBy.id,
-        firstName: cls.reservedBy.firstName,
-        lastName: cls.reservedBy.lastName
-      } : null
-    }));
-
-    logger.info(`Fetched schedule for module ${moduleId} with ${schedule.length} classes`);
-    return schedule;
   }
 
   private getWeekNumber(date: Date): number {

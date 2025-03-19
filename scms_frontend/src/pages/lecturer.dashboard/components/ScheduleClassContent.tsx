@@ -20,13 +20,13 @@ interface Schedule {
   date?: string;
 }
 
-interface ScheduleClassPageProps {
+interface ScheduleClassContentProps {
   moduleCode: string;
   moduleName: string;
   moduleId: number;
 }
 
-export function ScheduleClassPage({ moduleCode, moduleName, moduleId }: ScheduleClassPageProps) {
+export function ScheduleClassContent({ moduleCode, moduleName, moduleId }: ScheduleClassContentProps) {
   const navigate = useNavigate();
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
