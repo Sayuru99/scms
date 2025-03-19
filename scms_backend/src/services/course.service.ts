@@ -391,6 +391,7 @@ export class CourseService {
       week: this.getWeekNumber(cls.startTime),
       startTime: this.formatTime(cls.startTime),
       endTime: this.formatTime(cls.endTime),
+      date: cls.startTime.toISOString().split('T')[0],
       location: cls.location || "Not specified",
       capacity: cls.capacity,
       reservedBy: cls.reservedBy ? {
@@ -416,5 +417,50 @@ export class CourseService {
       minute: '2-digit',
       hour12: true
     });
+  }
+
+  async createModuleSchedule(moduleId: number, data: {
+    week: number;
+    startTime: string;
+    endTime: string;
+    location?: string;
+    capacity: number;
+  }) {
+    // First verify that the module exists and is not deleted
+    const module = await this.moduleRepo.findOne({
+      where: { id: moduleId, isDeleted: false },
+      relations: ["lecturer"]
+    });
+
+    if (!module) {
+      logger.warn(`Module not found: ${moduleId}`);
+      throw new NotFoundError("Module not found");
+    }
+
+    // Create a new class schedule
+    const classRepo = AppDataSource.getRepository(Class);
+    const newClass = classRepo.create({
+      startTime: new Date(data.startTime),
+      endTime: new Date(data.endTime),
+      location: data.location,
+      capacity: data.capacity,
+      isDeleted: false
+    });
+
+    // Set the module relationship
+    newClass.module = module;
+
+    await classRepo.save(newClass);
+
+    // Return the created schedule in the same format as getModuleSchedule
+    return {
+      id: newClass.id.toString(),
+      week: this.getWeekNumber(newClass.startTime),
+      startTime: this.formatTime(newClass.startTime),
+      endTime: this.formatTime(newClass.endTime),
+      location: newClass.location || "Not specified",
+      capacity: newClass.capacity,
+      reservedBy: null
+    };
   }
 }

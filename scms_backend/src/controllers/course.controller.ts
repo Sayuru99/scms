@@ -137,4 +137,14 @@ export class CourseController {
       next(error);
     }
   }
+
+  async createModuleSchedule(req: Request, res: Response, next: NextFunction) {
+    try {
+      const moduleId = parseInt(req.params.moduleId);
+      const schedule = await this.courseService.createModuleSchedule(moduleId, req.body);
+      res.status(201).json(schedule);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

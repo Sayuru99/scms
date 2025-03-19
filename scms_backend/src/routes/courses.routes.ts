@@ -67,4 +67,11 @@ router.get(
   courseController.getModuleSchedule.bind(courseController)
 );
 
+// create module schedule
+router.post(
+  "/:moduleId/schedule",
+  authMiddleware("schedule:class"),
+  courseController.createModuleSchedule.bind(courseController)
+);
+
 export default router;

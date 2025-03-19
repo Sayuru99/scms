@@ -61,6 +61,7 @@ export default function ScheduleClassPage() {
     <ScheduleClassPageComponent
       moduleCode={module.code || ''}
       moduleName={module.name}
+      moduleId={module.id}
     />
   );
 } 
