@@ -617,3 +617,26 @@ export interface Reservation {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Module {
+  id: number;
+  name: string;
+  code?: string;
+  semester: string;
+  credits: number;
+  isMandatory: boolean;
+  course: {
+    id: number;
+    code: string;
+    name: string;
+  };
+}
+
+export interface AssignedModulesResponse {
+  modules: Module[];
+}
+
+export const lecturerService = {
+  getAssignedModules: (token: string) =>
+    apiRequest<AssignedModulesResponse>("/api/lecturers/modules", "GET", undefined, token),
+};

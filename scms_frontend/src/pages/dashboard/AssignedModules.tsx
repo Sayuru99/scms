@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -9,60 +9,46 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import type { AssignedModule } from '../../services/lecturerService';
+import { Module, lecturerService } from '@/lib/api';
 import { Button } from "@/components/ui/button";
 import { ScheduleModal } from "@/components/modules/ScheduleModal";
-
-// Static data for assigned modules
-const staticModules: AssignedModule[] = [
-  {
-    id: 1,
-    code: "CS101",
-    name: "Introduction to Programming",
-    course: {
-      id: 1,
-      name: "Computer Science",
-      code: "CS"
-    },
-    semester: "1",
-    credits: 3,
-    isMandatory: true
-  },
-  {
-    id: 2,
-    code: "CS102",
-    name: "Data Structures",
-    course: {
-      id: 1,
-      name: "Computer Science",
-      code: "CS"
-    },
-    semester: "2",
-    credits: 4,
-    isMandatory: true
-  },
-  {
-    id: 3,
-    code: "CS201",
-    name: "Web Development",
-    course: {
-      id: 1,
-      name: "Computer Science",
-      code: "CS"
-    },
-    semester: "3",
-    credits: 3,
-    isMandatory: false
-  }
-];
+import Cookies from "js-cookie";
 
 export default function AssignedModules() {
-  const [modules] = useState<AssignedModule[]>(staticModules);
-  const [loading] = useState(false);
-  const [error] = useState<string | null>(null);
-  const [selectedModule, setSelectedModule] = useState<AssignedModule | null>(null);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedModule, setSelectedModule] = useState<Module | null>(null);
 
-  const handleScheduleClick = (module: AssignedModule) => {
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const token = Cookies.get("accessToken");
+        if (!token) {
+          setError("No authentication token found");
+          return;
+        }
+        const response = await lecturerService.getAssignedModules(token);
+        if (response && Array.isArray(response.modules)) {
+          setModules(response.modules);
+        } else {
+          console.error('Unexpected API response:', response);
+          setError('Invalid response format from server');
+          setModules([]);
+        }
+      } catch (err) {
+        console.error('Error fetching modules:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch modules');
+        setModules([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModules();
+  }, []);
+
+  const handleScheduleClick = (module: Module) => {
     setSelectedModule(module);
   };
 
@@ -138,7 +124,7 @@ export default function AssignedModules() {
         <ScheduleModal
           isOpen={!!selectedModule}
           onClose={() => setSelectedModule(null)}
-          moduleCode={selectedModule.code}
+          moduleCode={selectedModule.code || ''}
           moduleName={selectedModule.name}
         />
       )}
