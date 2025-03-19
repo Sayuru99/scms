@@ -22,13 +22,6 @@ export class Class {
   @Column({ type: "int", nullable: true })
   capacity?: number;
 
-  @Column({
-    type: "enum",
-    enum: ["Scheduled", "Ongoing", "Completed", "Cancelled"],
-    default: "Scheduled",
-  })
-  status!: string;
-
   @ManyToOne(() => User, { nullable: true })
   reservedBy?: User;
 

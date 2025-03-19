@@ -18,37 +18,42 @@ router.put(
   authMiddleware("update:courses"),
   courseController.updateCourse.bind(courseController)
 );
-
+ // get enrolled courses
 router.get(
   "/enrolled",
   authMiddleware("read:enrolled_courses"),
   courseController.getEnrolledCourses.bind(courseController)
 );
 
+// get available courses
 router.get(
   "/available",
   authMiddleware("read:courses"),
   courseController.getAvailableCourses.bind(courseController)
 );
 
+// get course by id
 router.get(
   "/:courseId",
   authMiddleware("read:courses"),
   courseController.getCourseById.bind(courseController)
 );
 
+// get all courses
 router.get(
   "/",
   authMiddleware("read:courses"),
   courseController.getCourses.bind(courseController)
 );
 
+// delete course
 router.delete(
   "/:courseId",
   authMiddleware("delete:courses"),
   courseController.deleteCourse.bind(courseController)
 );
 
+// enroll student
 router.post(
   "/:courseId/enroll",
   authMiddleware("create:enrollments"),

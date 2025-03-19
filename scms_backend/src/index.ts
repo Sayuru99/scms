@@ -1,4 +1,3 @@
-
 import "reflect-metadata";
 import express from "express";
 import cors from "cors";
@@ -15,6 +14,7 @@ import permissionRoutes from "./routes/permissions.routes";
 import roleRoutes from "./routes/roles.routes";
 import resourceRoutes from "./routes/resource.routes";
 import courseRoutes from "./routes/courses.routes";
+import lecturerRoutes from "./routes/lecturer.routes";
 import { ChatService } from "./services/chat.service";
 import { ChatController } from "./controllers/chat.controller";
 import chatRoutes from "./routes/chat.routes";
@@ -72,6 +72,7 @@ app.use("/api/permissions", permissionRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/resources", resourceRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/lecturers", lecturerRoutes);
 app.use("/api/chat", chatRoutes(chatController));
 
 app.use(errorHandler);
