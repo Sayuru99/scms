@@ -96,10 +96,10 @@ const ModuleSelection: React.FC<ModuleSelectionProps> = ({ title, semesters }) =
                             <div className="flex-1">
                               <h3 className="font-medium mb-2">{module.title}</h3>
                               <p className="text-sm text-muted-foreground mb-1">Credits: {module.credits}</p>
-                              <div className="flex items-center text-sm text-muted-foreground">
+                              {/* <div className="flex items-center text-sm text-muted-foreground">
                                 <Clock className="h-3.5 w-3.5 mr-1.5" />
                                 <span>Classes: {module.schedule}</span>
-                              </div>
+                              </div> */}
                             </div>
                             
                             <Button
