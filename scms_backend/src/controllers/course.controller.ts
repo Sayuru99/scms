@@ -174,4 +174,14 @@ export class CourseController {
       handleControllerError(error, res);
     }
   }
+
+  async getAllClassSchedules(req: Request, res: Response) {
+    try {
+      const studentId = req.user!.userId;
+      const schedules = await this.courseService.getAllClassSchedules(studentId);
+      res.json(schedules);
+    } catch (error) {
+      handleControllerError(error, res);
+    }
+  }
 }

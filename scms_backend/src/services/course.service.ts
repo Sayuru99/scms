@@ -543,4 +543,84 @@ export class CourseService {
       reservedBy: null
     };
   }
+
+  async getAllClassSchedules(studentId: string) {
+    try {
+      logger.info(`Fetching class schedules for student ${studentId}`);
+      
+      // First get all modules for courses the student is enrolled in
+      const moduleRepo = AppDataSource.getRepository(Module);
+      const modules = await moduleRepo
+        .createQueryBuilder("module")
+        .innerJoin("module.course", "course")
+        .innerJoin("course.enrollments", "enrollment")
+        .where("enrollment.studentId = :studentId", { studentId })
+        .andWhere("enrollment.isDeleted = false")
+        .andWhere("module.isDeleted = false")
+        .getMany();
+
+      if (modules.length === 0) {
+        logger.info(`No modules found for student ${studentId}`);
+        return [];
+      }
+
+      const moduleIds = modules.map(module => module.id);
+      logger.debug(`Found ${moduleIds.length} modules for student`);
+
+      // Get all classes for these modules
+      const classRepo = AppDataSource.getRepository(Class);
+      const classes = await classRepo
+        .createQueryBuilder("class")
+        .innerJoinAndSelect("class.module", "module")
+        .leftJoinAndSelect("module.lecturer", "lecturer")
+        .where("module.id IN (:...moduleIds)", { moduleIds })
+        .andWhere("class.isDeleted = false")
+        .orderBy("class.startTime", "ASC")
+        .getMany();
+
+      logger.debug(`Found ${classes.length} classes for the modules`);
+
+      // Log each class's dates for debugging
+      classes.forEach(cls => {
+        logger.debug(`Class ID ${cls.id} dates:`, {
+          rawStartTime: cls.startTime,
+          formattedStartTime: cls.startTime.toISOString(),
+          rawEndTime: cls.endTime,
+          formattedEndTime: cls.endTime.toISOString(),
+          moduleCode: cls.module.code,
+          moduleName: cls.module.name
+        });
+      });
+
+      // Transform the data
+      const transformedClasses = classes.map(cls => {
+        const transformed = {
+          id: cls.id.toString(),
+          title: `${cls.module.code} - ${cls.module.name}`,
+          startTime: cls.startTime.toISOString(),
+          endTime: cls.endTime.toISOString(),
+          location: cls.location || "TBA",
+          module: {
+            name: cls.module.name,
+            code: cls.module.code,
+            lecturer: cls.module.lecturer ? {
+              firstName: cls.module.lecturer.firstName,
+              lastName: cls.module.lecturer.lastName
+            } : null
+          }
+        };
+
+        logger.debug(`Transformed class ${cls.id}:`, transformed);
+        return transformed;
+      });
+
+      logger.info(`Successfully transformed ${transformedClasses.length} classes`);
+      return transformedClasses;
+
+    } catch (error) {
+      logger.error('Error in getAllClassSchedules:', error);
+      logger.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
+      throw error;
+    }
+  }
 }

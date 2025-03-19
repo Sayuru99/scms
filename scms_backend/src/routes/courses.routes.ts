@@ -81,4 +81,11 @@ router.put(
   courseController.updateModuleSchedule.bind(courseController)
 );
 
+// get all class schedules
+router.get(
+  "/schedules",
+  authMiddleware("read:class"),
+  courseController.getAllClassSchedules.bind(courseController)
+);
+
 export default router;
