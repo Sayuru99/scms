@@ -34,7 +34,7 @@ const Sidebar = () => {
     { name: "Users", path: "/users", icon: <FaUsers className="w-5 h-5" />, requiredPermission: "create:users" },
     { name: "Permissions", path: "/permissions", icon: <FaLock className="w-5 h-5" />, requiredPermission: "read:roles" },
     { name: "Courses", path: "/courses", icon: <BookOpen className="w-5 h-5" />, requiredPermission: "create:courses" },
-    { name: "Resources", path: "/resources", icon: <Briefcase className="w-5 h-5" />, requiredPermission: "read:resources" },
+    { name: "Resources", path: "/resources", icon: <Briefcase className="w-5 h-5" />, requiredPermission: "create:resources" },
     { name: "Calendar", path: "/calendar", icon: <FaCalendarAlt className="w-5 h-5" />, requiredPermission: "read:events" },
     { name: "Reservation", path: "/reservation", icon: <Album className="w-5 h-5" />, requiredPermission: "reserve:resources" },
     { name: "Events", path: "/events", icon: <FaBullhorn className="w-5 h-5" />, requiredPermission: "read:events" },
