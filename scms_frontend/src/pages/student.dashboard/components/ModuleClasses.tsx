@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, MapPin, User, Loader2 } from "lucide-react";
+import { Clock, MapPin, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { apiRequest } from "@/lib/api";
 import Cookies from "js-cookie";
@@ -10,15 +10,16 @@ export interface ModuleClass {
   day: string;
   time: string;
   location: string;
-  instructor: string;
 }
 
 interface ScheduleResponse {
-  id: number;
+  id: string;
+  week: number;
   startTime: string;
   endTime: string;
   date: string;
   location: string | null;
+  capacity: number;
   reservedBy: {
     id: string;
     firstName: string;
@@ -84,20 +85,18 @@ const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, on
           if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
             console.error('Invalid date received:', cls);
             return {
-              id: cls.id.toString(),
+              id: cls.id,
               day: 'Invalid Date',
               time: 'Invalid Time',
-              location: cls.location || "Not specified",
-              instructor: cls.reservedBy ? `${cls.reservedBy.firstName} ${cls.reservedBy.lastName}` : "Not assigned"
+              location: cls.location || "Not specified"
             };
           }
 
           return {
-            id: cls.id.toString(),
+            id: cls.id,
             day: startDateTime.toLocaleDateString('en-US', { weekday: 'long' }),
             time: `${startDateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${endDateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
-            location: cls.location || "Not specified",
-            instructor: cls.reservedBy ? `${cls.reservedBy.firstName} ${cls.reservedBy.lastName}` : "Not assigned"
+            location: cls.location || "Not specified"
           };
         });
 
@@ -158,10 +157,6 @@ const ModuleClasses: React.FC<ModuleClassesProps> = ({ moduleTitle, moduleId, on
                 <div className="flex items-center text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4 mr-2" />
                   <span>{classItem.location}</span>
-                </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <User className="h-4 w-4 mr-2" />
-                  <span>{classItem.instructor}</span>
                 </div>
               </CardContent>
             </Card>
