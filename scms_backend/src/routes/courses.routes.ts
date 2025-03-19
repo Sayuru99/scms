@@ -60,4 +60,11 @@ router.post(
   courseController.enrollStudent.bind(courseController)
 );
 
+// get module schedule
+router.get(
+  "/:moduleId/schedule",
+  authMiddleware("schedule:class"),
+  courseController.getModuleSchedule.bind(courseController)
+);
+
 export default router;

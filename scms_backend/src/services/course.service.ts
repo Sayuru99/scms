@@ -6,6 +6,7 @@ import { BadRequestError, NotFoundError } from "../utils/errors";
 import logger from "../config/logger";
 import { FindManyOptions, In, Like, Not } from "typeorm";
 import { Module } from "../entities/Module";
+import { Class } from "../entities/Class";
 
 interface CourseCreateParams {
   code: string;
@@ -360,5 +361,60 @@ export class CourseService {
 
     logger.info(`Fetched course with ID: ${courseId}`);
     return course;
+  }
+
+  async getModuleSchedule(moduleId: number) {
+    // First verify that the module exists and is not deleted
+    const module = await this.moduleRepo.findOne({
+      where: { id: moduleId, isDeleted: false },
+      relations: ["lecturer"]
+    });
+
+    if (!module) {
+      logger.warn(`Module not found: ${moduleId}`);
+      throw new NotFoundError("Module not found");
+    }
+
+    // Get all scheduled classes for this module
+    const classes = await AppDataSource
+      .getRepository(Class)
+      .createQueryBuilder("class")
+      .leftJoinAndSelect("class.reservedBy", "reservedBy")
+      .where("class.moduleId = :moduleId", { moduleId })
+      .andWhere("class.isDeleted = :isDeleted", { isDeleted: false })
+      .orderBy("class.startTime", "ASC")
+      .getMany();
+
+    // Transform the data to match the frontend's expected format
+    const schedule = classes.map(cls => ({
+      id: cls.id.toString(),
+      week: this.getWeekNumber(cls.startTime),
+      startTime: this.formatTime(cls.startTime),
+      endTime: this.formatTime(cls.endTime),
+      location: cls.location || "Not specified",
+      capacity: cls.capacity,
+      reservedBy: cls.reservedBy ? {
+        id: cls.reservedBy.id,
+        firstName: cls.reservedBy.firstName,
+        lastName: cls.reservedBy.lastName
+      } : null
+    }));
+
+    logger.info(`Fetched schedule for module ${moduleId} with ${schedule.length} classes`);
+    return schedule;
+  }
+
+  private getWeekNumber(date: Date): number {
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+    return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+  }
+
+  private formatTime(date: Date): string {
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
   }
 }

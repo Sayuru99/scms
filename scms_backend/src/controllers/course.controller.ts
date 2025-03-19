@@ -127,4 +127,14 @@ export class CourseController {
       next(error);
     }
   }
+
+  async getModuleSchedule(req: Request, res: Response, next: NextFunction) {
+    try {
+      const moduleId = parseInt(req.params.moduleId);
+      const schedule = await this.courseService.getModuleSchedule(moduleId);
+      res.json(schedule);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
