@@ -186,14 +186,14 @@ export function ScheduleClassPage({ moduleCode, moduleName, moduleId }: Schedule
 
       await apiRequest(
         `/api/courses/${moduleId}/schedule/${id}`,
-        "DELETE",
-        undefined,
+        "PUT",
+        { isDeleted: true },
         token,
         true
       );
 
       await fetchSchedules();
-      toast.success("Schedule deleted successfully");
+      toast.success("Schedule marked as deleted");
     } catch (err) {
       console.error('Error deleting schedule:', err);
       toast.error(err instanceof Error ? err.message : 'Failed to delete schedule');

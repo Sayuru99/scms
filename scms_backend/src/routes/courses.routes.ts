@@ -74,4 +74,11 @@ router.post(
   courseController.createModuleSchedule.bind(courseController)
 );
 
+// update module schedule
+router.put(
+  "/:moduleId/schedule/:scheduleId",
+  authMiddleware("schedule:class"),
+  courseController.updateModuleSchedule.bind(courseController)
+);
+
 export default router;

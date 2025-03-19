@@ -463,4 +463,60 @@ export class CourseService {
       reservedBy: null
     };
   }
+
+  async updateModuleSchedule(moduleId: number, scheduleId: number, data: {
+    startTime?: string;
+    endTime?: string;
+    location?: string;
+    capacity?: number;
+    isDeleted?: boolean;
+  }) {
+    // First verify that the module exists and is not deleted
+    const module = await this.moduleRepo.findOne({
+      where: { id: moduleId, isDeleted: false },
+      relations: ["lecturer"]
+    });
+
+    if (!module) {
+      logger.warn(`Module not found: ${moduleId}`);
+      throw new NotFoundError("Module not found");
+    }
+
+    // Find the class schedule
+    const classRepo = AppDataSource.getRepository(Class);
+    const existingClass = await classRepo.findOne({
+      where: { id: scheduleId, module: { id: moduleId }, isDeleted: false }
+    });
+
+    if (!existingClass) {
+      logger.warn(`Schedule not found: ${scheduleId}`);
+      throw new NotFoundError("Schedule not found");
+    }
+
+    // Update the class schedule
+    if (data.startTime) existingClass.startTime = new Date(data.startTime);
+    if (data.endTime) existingClass.endTime = new Date(data.endTime);
+    if (data.location !== undefined) existingClass.location = data.location;
+    if (data.capacity !== undefined) existingClass.capacity = data.capacity;
+    if (data.isDeleted !== undefined) existingClass.isDeleted = data.isDeleted;
+
+    await classRepo.save(existingClass);
+
+    if (data.isDeleted) {
+      logger.info(`Schedule ${scheduleId} marked as deleted`);
+      return { message: "Schedule deleted successfully" };
+    }
+
+    // Return the updated schedule in the same format as getModuleSchedule
+    return {
+      id: existingClass.id.toString(),
+      week: this.getWeekNumber(existingClass.startTime),
+      startTime: this.formatTime(existingClass.startTime),
+      endTime: this.formatTime(existingClass.endTime),
+      date: existingClass.startTime.toISOString().split('T')[0],
+      location: existingClass.location || "Not specified",
+      capacity: existingClass.capacity,
+      reservedBy: null
+    };
+  }
 }
