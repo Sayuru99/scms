@@ -63,7 +63,7 @@ router.post(
 // get module schedule
 router.get(
   "/:moduleId/schedule",
-  authMiddleware("schedule:class"),
+  authMiddleware("read:class"),
   courseController.getModuleSchedule.bind(courseController)
 );
 
