@@ -62,7 +62,7 @@ const chatService = new ChatService(io);
 const chatController = new ChatController(chatService);
 
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  // console.log(`User connected: ${socket.id}`);
   chatService.setupSocket(socket);
 });
 

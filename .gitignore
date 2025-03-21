@@ -7,3 +7,4 @@ scms_backend/logs/
 scms_backend/logs/error.log
 scms_backend/logs/combined.log
 scms_backend/hash.js
+individual/
